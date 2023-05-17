@@ -1,0 +1,145 @@
+
+
+.inner-banner {
+    min-height: 260px;
+    background: url(../../assets/images/banner2.jpg) no-repeat center;
+    -ms-background-size: cover;
+    background-size: cover;
+    z-index: 0;
+    position: relative;
+}
+
+.inner-banner:before {
+    content: "";
+    background: var(--bg-layer);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+}
+
+.w3l-breadcrumb {
+    background-color: var(--bg-color);
+}
+
+.breadcrumbs-custom-path {
+    padding: 15px 0;
+}
+
+.breadcrumbs-custom-path li {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.breadcrumbs-custom-path li span.fa {
+    font-size: 12px;
+    vertical-align: 2px;
+    opacity: .7;
+    color: var(--font-color);
+}
+
+.breadcrumbs-custom-path a,
+.breadcrumbs-custom-path a:active,
+.breadcrumbs-custom-path a:focus {
+    color: var(--font-color);
+    opacity: .7;
+}
+
+.breadcrumbs-custom-path li.active {
+    font-weight: 900;
+    color: var(--heading-color);
+}
+
+@media (max-width: 991px) {
+    .inner-banner {
+        min-height: 180px;
+    }
+}
+
+@media (max-width: 768px) {}
+
+@media (max-width: 415px) {
+    .inner-banner {
+        min-height: 120px;
+    }
+}
+
+
+.w3l-servicesblock,
+.w3l-products {
+    background: var(--bg-color);
+}
+
+.w3l-servicesblock .progress-info {
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.w3l-servicesblock .info1 h6.progress-tittle {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    width: 80%;
+}
+
+.w3l-servicesblock .info2 h6.progress-tittle {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    width: 95%;
+}
+
+.w3l-servicesblock .info3 h6.progress-tittle {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    width: 75%;
+}
+
+.w3l-servicesblock .progress {
+    display: flex;
+    height: 0.5em;
+    overflow: hidden;
+    font-size: 0.75rem;
+    background-color: var(--bg-grey);
+    border-radius: 0.25rem;
+}
+
+.w3l-servicesblock .progress-bar {
+    background-color: var(--primary-color);
+    transition: width 0.6s ease;
+}
+
+.w3l-servicesblock .progress-bar-striped {
+    background-image: none;
+    background-size: 1rem 1rem;
+}
+
+.w3l-servicesblock h6.progress-tittle {
+    font-size: 18px;
+    color: var(--heading-color);
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+
+@media screen and (max-width: 768px) {
+    .grids-ser span.fa {
+        font-size: 25px;
+        margin-bottom: 0px;
+    }
+}
+
+@media screen and (max-width:680px) {}
+
+@media screen and (max-width: 480px) {
+
+    .grids-ser {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+

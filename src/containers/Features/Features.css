@@ -1,0 +1,62 @@
+
+
+.w3l-features {
+    background-color: var(--bg-color);
+}
+
+.w3l-features .area-box {
+    padding: 30px 20px;
+    transition: all 0.5s ease 0s;
+    border-radius: var(--border-radius);
+    background-color: var(--bg-grey);
+    border: 1px solid var(--bg-grey);
+    position: relative;
+}
+
+.w3l-features .area-box:hover {
+    background: var(--bg-color);
+    border: 1px solid var(--primary-color);
+}
+
+.w3l-features .area-box:hover h4.number {
+    opacity: .2;
+    transition: 0.3s ease-in-out;
+}
+
+.w3l-features .icon span.fa {
+    color: var(--primary-color);
+    font-size: 30px;
+}
+
+.w3l-features .area-box .icon {
+    font-size: 38px;
+    color: var(--primary-color);
+}
+
+.w3l-features .area-box h4 a {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 18px;
+    /* margin-bottom: 15px; */
+    display: block;
+    color: var(--heading-color);
+    text-decoration: none;
+}
+
+.w3l-features .area-box h4 a:hover {
+    color: var(--primary-color);
+}
+
+@media (max-width: 991px) {
+
+    .w3l-features .area-box {
+        margin-bottom: 30px;
+    }
+
+    .w3l-features .area-box h4 a {
+        font-size: 16px;
+        margin-top: 16px;
+    }
+}
+
+

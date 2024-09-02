@@ -1,0 +1,207 @@
+/* Tailwind Custom Styles */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* General Styles */
+html {
+  @apply scroll-smooth;
+}
+
+body,
+html {
+  @apply m-0 p-0 bg-grey-light text-font-light font-sans;
+}
+
+body a,
+button,
+.btn {
+  @apply cursor-pointer;
+}
+
+button,
+input,
+select,
+label,
+li,
+span {
+  @apply appearance-none outline-none font-sans;
+}
+
+a,
+a:hover {
+  @apply no-underline;
+}
+
+iframe {
+  @apply border-none block;
+}
+
+ul {
+  @apply m-0 p-0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply m-0 p-0 text-heading-light;
+}
+
+p {
+  @apply m-0 p-0 text-lg leading-7 opacity-80 font-sans;
+}
+
+li {
+  @apply list-none;
+}
+
+/* Buttons */
+.btn-style {
+  @apply py-3 px-11 text-lg leading-8 font-semibold transition-all duration-300 rounded-md text-background-light bg-primary;
+}
+
+.btn-style.btn-white {
+  @apply bg-white text-primary border-transparent;
+}
+
+.btn-style:hover {
+  @apply border-transparent bg-secondary text-font-light;
+}
+
+.btn-style.btn-white:hover {
+  @apply border-transparent bg-primary text-white;
+}
+
+.btn-outline-border {
+  @apply bg-transparent text-primary border border-primary;
+}
+
+.btn-outline-border:hover {
+  @apply bg-primary text-white border-primary;
+}
+
+.transparent-btn {
+  @apply bg-white/25;
+}
+
+.btn-white {
+  @apply py-3 px-8 text-lg leading-8 font-semibold transition-all duration-300 rounded-md bg-white text-primary;
+}
+
+/* Title and Text */
+.title-sub {
+  @apply text-4xl font-bold text-font-light;
+}
+
+.title-sub.two,
+.test-p {
+  @apply text-white;
+}
+
+.title-left {
+  @apply text-2xl leading-10 font-semibold;
+}
+
+.title-main,
+.title-main.two {
+  @apply inline-block relative ;
+}
+
+.title-main span,
+.title-main.two,
+.title-main.three span {
+  @apply text-xl font-bold capitalize leading-10 tracking-tight text-primary pl-3.5;
+}
+
+.title-main.two span {
+  @apply text-white;
+}
+
+.title-main.three {
+  @apply text-primary;
+}
+
+.title-main span::before {
+  content: "";
+  @apply block bg-[#daffcc] w-10 h-10 absolute top-[-6px] rounded-md;
+}
+
+.title-main.two span::before,
+.title-main.three span::before {
+  content: "";
+  @apply block bg-white/25 w-10 h-10 absolute top-[-6px] rounded-md;
+}
+
+/* Responsive Design */
+@media (max-width: 1080px) {
+
+  .title-sub,
+  .title-sub.two {
+    @apply text-2xl leading-10;
+  }
+}
+
+@media (max-width: 736px) {
+  .title-left {
+    @apply text-xl leading-9;
+  }
+}
+
+@media (max-width: 568px) {
+
+  .title-sub,
+  .title-sub.two {
+    @apply text-xl leading-9;
+  }
+
+  p {
+    @apply text-base;
+  }
+
+  .title-main span,
+  .title-main.two,
+  .title-main.three span {
+    @apply text-base leading-7;
+  }
+}
+
+@media (max-width: 440px) {
+
+  .title-sub,
+  .title-sub.two {
+    @apply text-lg leading-9;
+  }
+
+  p {
+    @apply text-base;
+  }
+
+  .btn-white,
+  .btn-style {
+    @apply py-2.5 px-8 text-base;
+  }
+
+  .title-left {
+    @apply text-lg leading-8;
+  }
+}
+
+@media (max-width: 375px) {
+
+  .btn-white,
+  .btn-style {
+    @apply text-base;
+  }
+
+  .title-sub,
+  .title-sub.two {
+    @apply text-base leading-8;
+  }
+
+  .title-main {
+    @apply text-base tracking-tight;
+  }
+}

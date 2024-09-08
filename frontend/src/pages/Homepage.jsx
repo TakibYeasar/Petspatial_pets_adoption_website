@@ -1,5 +1,5 @@
 import React from 'react';
-import { About, Banner, Features, Post, Review, Slider, Whyus } from '../containers';
+import { About, Banner, Features, Pets, Review, Slider, Whyus } from '../containers';
 
 const Homepage = () => {
   return (
@@ -9,7 +9,7 @@ const Homepage = () => {
         <About />
         <Whyus />
         <Banner />
-        <Post />
+        <Pets />
         <Review />
     </div>
   )

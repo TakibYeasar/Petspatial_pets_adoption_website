@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { FaBars, FaPhone, FaSearch, FaTimes } from "react-icons/fa";
+import { FaBars, FaSearch, FaTimes } from "react-icons/fa";
 import { BsSun, BsMoon } from "react-icons/bs";
+import {SignIn, SignUp} from '../pages'; 
 
 const Navbar = () => {
-
-  // responsive menu icon
+  // Responsive menu icon
   const [clicktwo, setClicktwo] = useState(false);
   const handleClicktwo = () => setClicktwo(!clicktwo);
 
-  // navbar color change
+  // Navbar color change
   const [navbarColor, setNavbarColor] = useState(false);
   const changeNavbar = () => {
     if (window.scrollY >= 80) {
@@ -19,69 +19,130 @@ const Navbar = () => {
   };
   window.addEventListener("scroll", changeNavbar);
 
-  // change theme
+  // Change theme
   const [click, setClick] = useState(false);
-  const handleClick = () => setClick(!click);
   const [theme, setTheme] = useState("light-theme");
 
   const changeTheme = () => {
-    setTheme(theme === "dark-theme" ? "light-theme" : "dark-theme");
+    if (theme === "dark-theme") {
+      setTheme("light-theme");
+    } else {
+      setTheme("dark-theme");
+    }
   };
 
   useEffect(() => {
     document.body.className = theme;
   }, [theme]);
 
+  // Modal state for Sign In and Sign Up
+  const [isSignInModalOpen, setSignInModalOpen] = useState(false);
+  const [isSignUpModalOpen, setSignUpModalOpen] = useState(false);
+
+  const toggleSignInModal = () => setSignInModalOpen(!isSignInModalOpen);
+  const toggleSignUpModal = () => setSignUpModalOpen(!isSignUpModalOpen);
+
   return (
-    <header className={`fixed-top ${navbarColor ? "bg-bg-color transition ease-in-out duration-300" : "bg-transparent"} w-full h-[100px] grid items-center`}>
-      <div className="container mx-auto">
-        <nav className="flex items-center justify-between py-0">
-          <h1>
-            <a className="text-white font-bold text-[34px] tracking-wide" href="/">
-              Pet<span className="font-normal">spatial.</span>
+    <header
+      id="site-header"
+      className={`${navbarColor ? "bg-gray-900 shadow-md" : "bg-transparent"} fixed top-0 w-full py-4 z-50 transition-all duration-300 ease-in-out`}
+    >
+      <div className="container mx-auto px-4">
+        <nav className="navbar flex justify-between items-center">
+          <h1 className="text-white text-4xl font-bold">
+            <a href="/">
+              Pet<span className="font-light">spatial.</span>
             </a>
           </h1>
 
-          <div className={`${clicktwo ? "fixed top-0 left-0 right-0 z-50" : "collapse"} bg-transparent lg:flex lg:items-center lg:static`}>
-            <ul className="flex flex-col lg:flex-row lg:items-center">
-              <li className="nav-item active">
-                <a className="text-white text-[18px] font-medium px-[10px] py-[6px] hover:text-primary transition" href="/">Home</a>
-              </li>
+          <div className={`${clicktwo ? "fixed top-0 w-full" : "hidden lg:flex"} lg:flex-grow lg:flex lg:items-center`}>
+            <ul className="lg:flex lg:space-x-8 text-white">
               <li className="nav-item">
-                <a className="text-white text-[18px] font-medium px-[10px] py-[6px] hover:text-primary transition" href="/about">About</a>
-              </li>
-              <li className="nav-item">
-                <a className="text-white text-[18px] font-medium px-[10px] py-[6px] hover:text-primary transition" href="/services">Services</a>
-              </li>
-              <li className="nav-item">
-                <a className="text-white text-[18px] font-medium px-[10px] py-[6px] hover:text-primary transition" href="/contact">Contact</a>
-              </li>
-            </ul>
-
-            <ul className="flex items-center mt-4 lg:mt-0">
-              <li className="mr-2">
-                <a href="#search" className="bg-[rgba(255,255,255,0.12)] text-white text-[20px] w-[45px] h-[45px] rounded-full flex items-center justify-center hover:bg-primary transition">
-                  <FaSearch aria-hidden="true" />
+                <a className="nav-link hover:text-primary" href="/">
+                  Home
                 </a>
               </li>
-              <li className="mx-4 hidden lg:block">
-                <a href="tel:+(12)234-11-24" className="bg-bg-light text-primary text-[15px] font-medium py-[12px] px-[26px] rounded-[4px] flex items-center">
-                  <FaPhone className="mr-[8px]" aria-hidden="true" /> (32)234-14-94
+              <li className="nav-item">
+                <a className="nav-link hover:text-primary" href="/about">
+                  About
+                </a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link hover:text-primary" href="/services">
+                  Services
+                </a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link hover:text-primary" href="/contact">
+                  Contact
                 </a>
               </li>
             </ul>
           </div>
 
-          <div className="absolute right-[50px] top-[36px] flex items-center">
-            <div className="cursor-pointer text-xl text-white" onClick={() => changeTheme()}>
-              {click ? <BsSun /> : <BsMoon />}
+          <div className="flex items-center">
+            <div className={`${clicktwo ? "fixed top-0 w-full" : "hidden lg:flex"} lg:flex-grow lg:flex lg:items-center`}>
+              <ul className="lg:flex lg:space-x-8 text-white items-center">
+                <li className="nav-item">
+                  <a href="#search" className="bg-white/20 p-3 rounded-full text-white hover:bg-primary transition-all">
+                    <FaSearch aria-hidden="true" />
+                  </a>
+                </li>
+
+                <li className="nav-item">
+                  <button className="nav-link hover:text-primary" onClick={toggleSignInModal}>
+                    Sign-In
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button className="nav-link hover:text-primary" onClick={toggleSignUpModal}>
+                    Sign-Up
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <div className="theme-switch-wrapper flex items-center">
+              <div className="icon cursor-pointer text-white text-2xl" onClick={changeTheme}>
+                {click ? <BsSun /> : <BsMoon />}
+              </div>
+            </div>
+
+            <div className="ml-4 lg:hidden" onClick={handleClicktwo}>
+              {clicktwo ? <FaTimes className="text-white text-2xl" /> : <FaBars className="text-white text-2xl" />}
             </div>
           </div>
-
-          <div className="cursor-pointer text-white text-[20px] w-[34px] h-[34px] flex items-center justify-center rounded-[4px] bg-primary lg:hidden" onClick={handleClicktwo}>
-            {clicktwo ? <FaTimes /> : <FaBars />}
-          </div>
         </nav>
+
+        {/* Sign In Modal */}
+        {isSignInModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative">
+              <SignIn />
+              <button
+                onClick={toggleSignInModal}
+                className="absolute top-4 right-4 text-gray-700 hover:text-gray-900"
+              >
+                <FaTimes />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Sign Up Modal */}
+        {isSignUpModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative">
+              <SignUp />
+              <button
+                onClick={toggleSignUpModal}
+                className="absolute top-4 right-4 text-gray-700 hover:text-gray-900"
+              >
+                <FaTimes />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );

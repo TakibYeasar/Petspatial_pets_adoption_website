@@ -1,60 +1,112 @@
-import React from 'react';
-import { motion, useAnimation, useInView } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useSwipeable } from 'react-swipeable';
 import b1 from "../../public/assets/images/banner1.jpg";
 import b2 from "../../public/assets/images/banner2.jpg";
 import b3 from "../../public/assets/images/banner3.jpg";
 
-const images = [b1, b2, b3];
+const slides = [
+  {
+    title: "Grooming & Pet Supplies.",
+    description:
+      "Lorem ipsum viverra feugiat. Pellen tesque libero ut justo, ultrices in ligula. Semper at tempufddfel. Lorem ipsum dolor sit amet elit.",
+    location: "253 Adams Ave, Iowa",
+    hours: "Mon - Sat 8am - 6pm",
+    image: b1,
+  },
+  {
+    title: "Caring is More Daring.",
+    description:
+      "Lorem ipsum viverra feugiat. Pellen tesque libero ut justo, ultrices in ligula. Semper at tempufddfel. Lorem ipsum dolor sit amet elit.",
+    location: "253 Adams Ave, Iowa",
+    hours: "Mon - Sat 8am - 6pm",
+    image: b2,
+  },
+  {
+    title: "Grooming & Pet Supplies.",
+    description:
+      "Lorem ipsum viverra feugiat. Pellen tesque libero ut justo, ultrices in ligula. Semper at tempufddfel. Lorem ipsum dolor sit amet elit.",
+    location: "253 Adams Ave, Iowa",
+    hours: "Mon - Sat 8am - 6pm",
+    image: b3,
+  },
+];
 
 const Slider = () => {
-  const [currentIndex, setCurrentIndex] = React.useState(0);
-  const controls = useAnimation();
-  const ref = React.useRef(null);
-  const inView = useInView(ref, { once: true });
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  React.useEffect(() => {
-    if (inView) {
-      controls.start({ opacity: 1 });
-    }
-  }, [inView, controls]);
-
-  React.useEffect(() => {
+  // Auto-slide effect
+  useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 3000); // Change slide every 3 seconds
+      setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+    }, 5000); // 5 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, [currentSlide]);
+
+  // Swipe handlers for touch gestures
+  const handlers = useSwipeable({
+    onSwipedLeft: () => handleNext(),
+    onSwipedRight: () => handlePrev(),
+    preventDefaultTouchmoveEvent: true,
+    trackTouch: true,
+    trackMouse: true,
+  });
+
+  // Handle manual previous slide
+  const handlePrev = () => {
+    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  };
+
+  // Handle manual next slide
+  const handleNext = () => {
+    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+  };
 
   return (
-    <section className="relative z-10" id="home" ref={ref}>
-      <div className="relative">
-        {images.map((image, index) => (
+    <section className="relative z-10" id="home" {...handlers}>
+      <div className="relative w-full h-screen overflow-hidden">
+        <AnimatePresence initial={false}>
           <motion.div
-            key={index}
-            className={`absolute inset-0 bg-cover bg-center min-h-[720px] flex items-center justify-center ${index === currentIndex ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
-            style={{ backgroundImage: `url(${image})` }}
-            animate={controls}
+            key={currentSlide}
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            transition={{ duration: 0.6 }}
+            className="absolute inset-0 w-full h-full"
+            style={{
+              backgroundImage: `url(${slides[currentSlide].image})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
           >
-            <div className="absolute inset-0 bg-black opacity-40"></div>
-            <div className="relative z-10 text-center text-white px-4 py-6">
-              <div className="container mx-auto">
-                <div className="mb-6">
-                  <h3 className="text-5xl lg:text-7xl font-bold mb-4">Grooming & Pet Supplies.</h3>
-                  <p className="text-lg lg:text-xl mb-4">Lorem ipsum viverra feugiat. Pellen tesque libero ut justo, ultrices in ligula. Semper at tempufddfel. Lorem ipsum dolor sit amet elit.</p>
-                  <a href="/about" className="inline-block border border-white text-white py-2 px-6 font-semibold hover:bg-blue-500 hover:border-blue-500">Read More</a>
-                </div>
-                <div className="grid grid-cols-2 gap-4 mt-6 text-sm">
-                  <h5 className="text-white">Our Location : 253 Adams Ave, Iowa</h5>
-                  <h5 className="text-white text-right">Open Hours : Mon - Sat 8am - 6pm</h5>
+            <div className="flex items-center justify-center h-full bg-black bg-opacity-50">
+              <div className="text-center text-white max-w-xl mx-auto">
+                <h3 className="text-6xl md:text-8xl font-bold mb-6">
+                  {slides[currentSlide].title}
+                </h3>
+                <p className="text-lg mb-6">{slides[currentSlide].description}</p>
+                <a
+                  href="/about"
+                  className="inline-block mt-4 px-8 py-3 text-sm font-medium border border-white text-white hover:bg-blue-500 hover:border-blue-500"
+                >
+                  Read More
+                </a>
+                <div className="grid grid-cols-2 gap-4 mt-6">
+                  <h5 className="text-lg">
+                    <strong>Our Location:</strong> {slides[currentSlide].location}
+                  </h5>
+                  <h5 className="text-lg text-right">
+                    <strong>Open Hours:</strong> {slides[currentSlide].hours}
+                  </h5>
                 </div>
               </div>
             </div>
           </motion.div>
-        ))}
+        </AnimatePresence>
       </div>
     </section>
   );
-}
+};
 
 export default Slider;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import team1 from "../../public/assets/images/team1.jpg";
 import team2 from "../../public/assets/images/team2.jpg";
@@ -54,13 +54,47 @@ const testimonials = [
 
 const Review = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
-  const handlePrev = () => {
-    setCurrentSlide((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
+  // Automatically switch slides every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prevSlide) =>
+        prevSlide === testimonials.length - 2 ? 0 : prevSlide + 1
+      );
+    }, 5000); // 5 seconds interval
+
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, []);
+
+  // Handle touch start
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.changedTouches[0].screenX;
   };
 
-  const handleNext = () => {
-    setCurrentSlide((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1));
+  // Handle touch end
+  const handleTouchEnd = (e) => {
+    touchEndX.current = e.changedTouches[0].screenX;
+    handleSwipeGesture();
+  };
+
+  // Detect swipe gesture
+  const handleSwipeGesture = () => {
+    const swipeDistance = touchStartX.current - touchEndX.current;
+    const swipeThreshold = 50; // Minimum swipe distance to detect as a swipe
+
+    if (swipeDistance > swipeThreshold) {
+      // Swipe left (next slide)
+      setCurrentSlide((prevSlide) =>
+        prevSlide === testimonials.length - 2 ? 0 : prevSlide + 1
+      );
+    } else if (swipeDistance < -swipeThreshold) {
+      // Swipe right (previous slide)
+      setCurrentSlide((prevSlide) =>
+        prevSlide === 0 ? testimonials.length - 2 : prevSlide - 1
+      );
+    }
   };
 
   return (
@@ -75,39 +109,37 @@ const Review = () => {
             </div>
           </div>
           <div className="md:w-2/3 p-6 relative">
-            <div className="flex justify-between items-center absolute inset-0 z-10">
-              <button onClick={handlePrev} className="bg-gray-300 p-2 rounded-full">Prev</button>
-              <button onClick={handleNext} className="bg-gray-300 p-2 rounded-full">Next</button>
-            </div>
-            <div className="relative">
+            <div
+              className="relative flex"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
               <AnimatePresence>
-                {testimonials.map((testimonial, index) => (
-                  index === currentSlide && (
-                    <motion.div
-                      key={index}
-                      className="flex flex-wrap"
-                      initial={{ opacity: 0, x: 50 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -50 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <div className="w-full md:w-1/2 p-4">
-                        <div className="bg-white p-6 rounded-lg shadow-lg">
-                          <blockquote className="italic mb-4">
-                            <q className="text-xl font-semibold text-gray-800">{testimonial.quote}</q>
-                          </blockquote>
-                          <p className="text-gray-600">{testimonial.text}</p>
-                          <div className="flex items-center mt-4">
-                            <img src={testimonial.image} alt="team member" className="w-16 h-16 rounded-full" />
-                            <div className="ml-4">
-                              <h3 className="text-lg font-semibold text-gray-800">{testimonial.name}</h3>
-                              <p className="text-sm text-gray-500">{testimonial.city}</p>
-                            </div>
+                {testimonials.slice(currentSlide, currentSlide + 2).map((testimonial, index) => (
+                  <motion.div
+                    key={index}
+                    className="flex flex-wrap"
+                    initial={index === 0 ? { opacity: 0, x: -50 } : { opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={index === 0 ? { opacity: 0, x: 50 } : { opacity: 0, x: -50 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div className="w-full md:w-1/2 p-4">
+                      <div className="bg-white p-6 rounded-lg shadow-lg">
+                        <blockquote className="italic mb-4">
+                          <q className="text-xl font-semibold text-gray-800">{testimonial.quote}</q>
+                        </blockquote>
+                        <p className="text-gray-600">{testimonial.text}</p>
+                        <div className="flex items-center mt-4">
+                          <img src={testimonial.image} alt="team member" className="w-16 h-16 rounded-full" />
+                          <div className="ml-4">
+                            <h3 className="text-lg font-semibold text-gray-800">{testimonial.name}</h3>
+                            <p className="text-sm text-gray-500">{testimonial.city}</p>
                           </div>
                         </div>
                       </div>
-                    </motion.div>
-                  )
+                    </div>
+                  </motion.div>
                 ))}
               </AnimatePresence>
             </div>

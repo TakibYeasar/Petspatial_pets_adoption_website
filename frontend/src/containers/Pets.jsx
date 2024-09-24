@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import PetDetails from './pets/PetDetails';
+import PetDetails from './PetDetails';
 
 // Sample data for pets
 const pets = [

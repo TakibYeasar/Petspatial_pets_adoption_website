@@ -57,42 +57,35 @@ const Review = () => {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
-  // Automatically switch slides every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prevSlide) =>
-        prevSlide === testimonials.length - 2 ? 0 : prevSlide + 1
+        prevSlide === testimonials.length - 1 ? 0 : prevSlide + 1
       );
-    }, 5000); // 5 seconds interval
-
-    return () => clearInterval(interval); // Cleanup on component unmount
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
-  // Handle touch start
   const handleTouchStart = (e) => {
     touchStartX.current = e.changedTouches[0].screenX;
   };
 
-  // Handle touch end
   const handleTouchEnd = (e) => {
     touchEndX.current = e.changedTouches[0].screenX;
     handleSwipeGesture();
   };
 
-  // Detect swipe gesture
   const handleSwipeGesture = () => {
     const swipeDistance = touchStartX.current - touchEndX.current;
-    const swipeThreshold = 50; // Minimum swipe distance to detect as a swipe
+    const swipeThreshold = 50;
 
     if (swipeDistance > swipeThreshold) {
-      // Swipe left (next slide)
       setCurrentSlide((prevSlide) =>
-        prevSlide === testimonials.length - 2 ? 0 : prevSlide + 1
+        prevSlide === testimonials.length - 1 ? 0 : prevSlide + 1
       );
     } else if (swipeDistance < -swipeThreshold) {
-      // Swipe right (previous slide)
       setCurrentSlide((prevSlide) =>
-        prevSlide === 0 ? testimonials.length - 2 : prevSlide - 1
+        prevSlide === 0 ? testimonials.length - 1 : prevSlide - 1
       );
     }
   };
@@ -104,8 +97,8 @@ const Review = () => {
           <div className="md:w-1/3 mb-8 md:mb-0">
             <div className="text-left p-6">
               <h6 className="text-base font-semibold mb-2 text-primary"><span>Reviews</span></h6>
-              <h3 className="text-3xl font-bold">Testimonials</h3>
-              <p className="mt-3 text-gray-600">Lorem ipsum viverra feugiat. Pellentesque libero ut justo, ultrices in ligula. Semper at tempor.</p>
+              <h3 className="text-3xl font-bold text-gray-800">Testimonials</h3>
+              <p className="mt-3 text-gray-600">Discover what our clients say about us. Your satisfaction is our priority!</p>
             </div>
           </div>
           <div className="md:w-2/3 p-6 relative">
@@ -115,23 +108,23 @@ const Review = () => {
               onTouchEnd={handleTouchEnd}
             >
               <AnimatePresence>
-                {testimonials.slice(currentSlide, currentSlide + 2).map((testimonial, index) => (
+                {testimonials.slice(currentSlide, currentSlide + 1).map((testimonial, index) => (
                   <motion.div
                     key={index}
                     className="flex flex-wrap"
-                    initial={index === 0 ? { opacity: 0, x: -50 } : { opacity: 0, x: 50 }}
+                    initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={index === 0 ? { opacity: 0, x: 50 } : { opacity: 0, x: -50 }}
+                    exit={{ opacity: 0, x: 50 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <div className="w-full md:w-1/2 p-4">
-                      <div className="bg-white p-6 rounded-lg shadow-lg">
+                    <div className="w-full p-4">
+                      <div className="bg-white p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
                         <blockquote className="italic mb-4">
                           <q className="text-xl font-semibold text-gray-800">{testimonial.quote}</q>
                         </blockquote>
                         <p className="text-gray-600">{testimonial.text}</p>
                         <div className="flex items-center mt-4">
-                          <img src={testimonial.image} alt="team member" className="w-16 h-16 rounded-full" />
+                          <img src={testimonial.image} alt={testimonial.name} className="w-16 h-16 rounded-full" />
                           <div className="ml-4">
                             <h3 className="text-lg font-semibold text-gray-800">{testimonial.name}</h3>
                             <p className="text-sm text-gray-500">{testimonial.city}</p>
@@ -143,24 +136,6 @@ const Review = () => {
                 ))}
               </AnimatePresence>
             </div>
-          </div>
-        </div>
-        <div className="flex flex-wrap justify-around mt-10">
-          <div className="w-1/2 sm:w-1/4 text-center">
-            <p className="text-4xl font-bold text-gray-800">1500+</p>
-            <h3 className="text-lg font-semibold text-primary mt-2">Acres Of Forests</h3>
-          </div>
-          <div className="w-1/2 sm:w-1/4 text-center">
-            <p className="text-4xl font-bold text-gray-800">1160+</p>
-            <h3 className="text-lg font-semibold text-primary mt-2">Million People</h3>
-          </div>
-          <div className="w-1/2 sm:w-1/4 text-center mt-6 sm:mt-0">
-            <p className="text-4xl font-bold text-gray-800">1145k</p>
-            <h3 className="text-lg font-semibold text-primary mt-2">Thousand Hectares</h3>
-          </div>
-          <div className="w-1/2 sm:w-1/4 text-center mt-6 sm:mt-0">
-            <p className="text-4xl font-bold text-gray-800">1145k</p>
-            <h3 className="text-lg font-semibold text-primary mt-2">Billion Donations</h3>
           </div>
         </div>
       </div>

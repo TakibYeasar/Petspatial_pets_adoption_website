@@ -81,22 +81,24 @@ const Slider = () => {
             }}
           >
             <div className="flex items-center justify-center h-full bg-black bg-opacity-50">
-              <div className="text-center text-white max-w-xl mx-auto">
-                <h3 className="text-6xl md:text-8xl font-bold mb-6">
+              <div className="text-center text-white max-w-3xl mx-auto">
+                <h3 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
                   {slides[currentSlide].title}
                 </h3>
-                <p className="text-lg mb-6">{slides[currentSlide].description}</p>
+                <p className="text-base sm:text-lg lg:text-xl mb-4 leading-relaxed">
+                  {slides[currentSlide].description}
+                </p>
                 <a
                   href="/about"
-                  className="inline-block mt-4 px-8 py-3 text-sm font-medium border border-white text-white hover:bg-blue-500 hover:border-blue-500"
+                  className="inline-block mt-4 px-8 py-3 text-sm font-medium border border-white text-white hover:bg-blue-600 hover:border-blue-600 transition"
                 >
                   Read More
                 </a>
                 <div className="grid grid-cols-2 gap-4 mt-6">
-                  <h5 className="text-lg">
-                    <strong>Our Location:</strong> {slides[currentSlide].location}
+                  <h5 className="text-base sm:text-lg">
+                    <strong>Location:</strong> {slides[currentSlide].location}
                   </h5>
-                  <h5 className="text-lg text-right">
+                  <h5 className="text-base sm:text-lg text-right">
                     <strong>Open Hours:</strong> {slides[currentSlide].hours}
                   </h5>
                 </div>

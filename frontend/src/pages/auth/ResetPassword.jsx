@@ -1,6 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { SignIn } from '../index';
 
 const ResetPassword = () => {
+    const [showSignIn, setShowSignIn] = useState(false);
+
+    const handleSignInClick = () => {
+        setShowSignIn(true);
+    };
+
+    const closeModal = () => {
+        setShowSignIn(false);
+    };
+
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100">
             <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
@@ -37,13 +48,25 @@ const ResetPassword = () => {
                 </form>
 
                 <div className="text-center mt-6">
-                    <a href="/signin" className="text-sm text-primary hover:text-secondary transition duration-300">
+                    <button
+                        type="button"
+                        onClick={handleSignInClick}
+                        className="text-sm text-primary hover:text-secondary transition duration-300"
+                    >
                         Back to Sign In
-                    </a>
+                    </button>
                 </div>
             </div>
+
+            {showSignIn && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg p-5 w-1/3">
+                        <SignIn onClose={closeModal} />
+                    </div>
+                </div>
+            )}
         </div>
     );
-}
+};
 
 export default ResetPassword;

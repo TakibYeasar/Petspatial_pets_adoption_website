@@ -1,7 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { SignIn } from '../index';
 import { FaFacebook, FaGoogle, FaTwitter } from 'react-icons/fa';
 
 const SignUp = () => {
+    const [showSignIn, setShowSignIn] = useState(false);
+
+    const handleSignInClick = () => {
+        setShowSignIn(true);
+    };
+
+    const closeModal = () => {
+        setShowSignIn(false);
+    };
+
     return (
         <div className="container flex justify-center items-center min-h-screen">
             <div className="w-full max-w-lg bg-white shadow-lg rounded-lg p-8 bg-gradient-to-br from-white via-gray-50 to-gray-100">
@@ -59,12 +70,26 @@ const SignUp = () => {
 
                 <div className="text-center mt-6">
                     <p className="text-sm text-gray-600">Already have an account?
-                        <a href="#" className="text-primary font-medium ml-1 hover:text-secondary transition duration-300">Sign in</a>
+                        <button
+                            type="button"
+                            onClick={handleSignInClick}
+                            className="text-primary font-medium ml-1 hover:text-secondary transition duration-300"
+                        >
+                            Sign in
+                        </button>
                     </p>
                 </div>
             </div>
+
+            {showSignIn && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg p-5 w-1/3">
+                        <SignIn onClose={closeModal} />
+                    </div>
+                </div>
+            )}
         </div>
     );
-}
+};
 
 export default SignUp;

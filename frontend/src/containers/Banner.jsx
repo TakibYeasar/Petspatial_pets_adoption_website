@@ -12,10 +12,10 @@ const Banner = () => {
         <div className="flex flex-col lg:flex-row items-center">
           <div className="lg:w-7/12 pr-5">
             <div className="text-left text-white">
-              <h6 className="text-xl font-semibold mb-3">
+              <h6 className="text-xl font-semibold mb-3 text-white">
                 Better pet nutrition.
               </h6>
-              <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+              <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight text-white">
                 The finest fresh food and all your pet needs.
               </h3>
               <p className="text-lg sm:text-xl opacity-80 mb-6 leading-relaxed">

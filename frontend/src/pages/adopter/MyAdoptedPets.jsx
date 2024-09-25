@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 const MyAdoptedPets = () => {
-  // Sample data representing pets that have been adopted
   const [adoptedPets, setAdoptedPets] = useState([
     { id: 1, name: 'Charlie', type: 'Dog', age: 4, status: 'Adopted' },
     { id: 2, name: 'Luna', type: 'Cat', age: 2, status: 'Adopted' },

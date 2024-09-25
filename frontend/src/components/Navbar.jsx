@@ -38,14 +38,12 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4">
         <nav className="flex justify-between items-center py-4">
-          {/* Brand Logo */}
           <h1 className="text-3xl font-bold text-white">
             <a href="/">
               Pet<span className="text-primary">Spatial</span>
             </a>
           </h1>
 
-          {/* Main Navigation */}
           <div className={`lg:flex lg:items-center lg:space-x-8 text-white ${isMenuOpen ? 'block' : 'hidden'} lg:block`}>
             <ul className="lg:flex lg:space-x-8 text-white">
               <li><a href="/" className="hover:text-primary transition">Home</a></li>
@@ -54,7 +52,6 @@ const Navbar = () => {
               <li><a href="/contact" className="hover:text-primary transition">Contact</a></li>
             </ul>
 
-            {/* Sign In/Sign Up & Theme Toggle */}
             <div className="mt-4 lg:mt-0 lg:flex lg:space-x-4 items-center">
               <button
                 onClick={() => setSignInModalOpen(true)}
@@ -74,14 +71,12 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Mobile Menu Icon */}
           <div className="lg:hidden text-white text-2xl cursor-pointer" onClick={toggleMenu}>
             {isMenuOpen ? <FaTimes /> : <FaBars />}
           </div>
         </nav>
       </div>
 
-      {/* Sign In Modal */}
       {isSignInModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative">
@@ -96,7 +91,6 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Sign Up Modal */}
       {isSignUpModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative">

@@ -11,6 +11,7 @@ import {
   PublisherDashboard,
 } from "./pages";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AllPets from './pages/AllPets';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Homepage />} />
+        <Route path="/allpets" element={<AllPets />} />
         <Route path="/about" element={<Aboutpage />} />
         <Route path="/services" element={<Servicepage />} />
         <Route path="/contact" element={<Contactpage />} />

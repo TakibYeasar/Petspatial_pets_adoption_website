@@ -42,12 +42,10 @@ const contactDetails = [
 const Contact = () => {
   return (
     <div className="contact-sec">
-      {/* Banner Section */}
       <div className="relative min-h-[260px] bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url('/assets/images/banner2.jpg')` }}>
         <div className="absolute inset-0 bg-font bg-opacity-50"></div>
       </div>
 
-      {/* Breadcrumbs Section */}
       <section className="bg-gray-100 py-4">
         <div className="container mx-auto px-4">
           <ul className="flex items-center text-lg font-semibold text-gray-900">
@@ -62,7 +60,6 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* Contact Information Section */}
       <section className="bg-gray-100 py-12" id="contact">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap mb-8">
@@ -79,7 +76,6 @@ const Contact = () => {
             </div>
           </div>
 
-          {/* Contact Details Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center py-8">
             {contactDetails.map(({ icon, title, content }) => (
               <div key={title} className="bg-white p-8 rounded-lg shadow-lg">
@@ -90,7 +86,6 @@ const Contact = () => {
             ))}
           </div>
 
-          {/* Contact Form Section */}
           <div className="max-w-3xl mx-auto pt-12">
             <h5 className="text-2xl font-semibold text-gray-900 mb-4">Get in Touch. We're Here to Help</h5>
             <form action="" method="post">

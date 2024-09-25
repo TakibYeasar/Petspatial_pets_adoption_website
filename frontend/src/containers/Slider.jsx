@@ -10,24 +10,18 @@ const slides = [
     title: "Grooming & Pet Supplies.",
     description:
       "Lorem ipsum viverra feugiat. Pellen tesque libero ut justo, ultrices in ligula. Semper at tempufddfel. Lorem ipsum dolor sit amet elit.",
-    location: "253 Adams Ave, Iowa",
-    hours: "Mon - Sat 8am - 6pm",
     image: b1,
   },
   {
     title: "Caring is More Daring.",
     description:
       "Lorem ipsum viverra feugiat. Pellen tesque libero ut justo, ultrices in ligula. Semper at tempufddfel. Lorem ipsum dolor sit amet elit.",
-    location: "253 Adams Ave, Iowa",
-    hours: "Mon - Sat 8am - 6pm",
     image: b2,
   },
   {
     title: "Grooming & Pet Supplies.",
     description:
       "Lorem ipsum viverra feugiat. Pellen tesque libero ut justo, ultrices in ligula. Semper at tempufddfel. Lorem ipsum dolor sit amet elit.",
-    location: "253 Adams Ave, Iowa",
-    hours: "Mon - Sat 8am - 6pm",
     image: b3,
   },
 ];
@@ -82,7 +76,7 @@ const Slider = () => {
           >
             <div className="flex items-center justify-center h-full bg-black bg-opacity-50">
               <div className="text-center text-white max-w-3xl mx-auto">
-                <h3 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
+                <h3 className="text-4xl text-white sm:text-5xl lg:text-6xl font-extrabold mb-4">
                   {slides[currentSlide].title}
                 </h3>
                 <p className="text-base sm:text-lg lg:text-xl mb-4 leading-relaxed">
@@ -90,18 +84,10 @@ const Slider = () => {
                 </p>
                 <a
                   href="/about"
-                  className="inline-block mt-4 px-8 py-3 text-sm font-medium border border-white text-white hover:bg-blue-600 hover:border-blue-600 transition"
+                  className="btn-outline-border"
                 >
                   Read More
                 </a>
-                <div className="grid grid-cols-2 gap-4 mt-6">
-                  <h5 className="text-base sm:text-lg">
-                    <strong>Location:</strong> {slides[currentSlide].location}
-                  </h5>
-                  <h5 className="text-base sm:text-lg text-right">
-                    <strong>Open Hours:</strong> {slides[currentSlide].hours}
-                  </h5>
-                </div>
               </div>
             </div>
           </motion.div>

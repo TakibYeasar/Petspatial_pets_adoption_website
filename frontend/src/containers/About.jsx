@@ -19,7 +19,7 @@ const About = () => {
                 Lorem ipsum dolor sit amet. Lorem ipsum init dolor sit, amet elit. Dolor ipsum non
                 velit, culpa! Vivamus a et ut justo, init in dolor et.
               </p>
-              <a className="inline-block mt-8 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-300" href="/about">
+              <a className="btn-style" href="/about">
                 Read More
               </a>
             </div>
@@ -44,7 +44,7 @@ const About = () => {
                 Lorem ipsum dolor sit amet. Lorem ipsum init dolor sit, amet elit. Dolor ipsum non
                 velit, culpa! Vivamus a et ut justo, init in dolor et.
               </p>
-              <a className="inline-block mt-8 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-300" href="/about">
+              <a className="btn-style" href="/about">
                 Read More
               </a>
             </div>

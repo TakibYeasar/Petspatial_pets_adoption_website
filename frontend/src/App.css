@@ -76,7 +76,7 @@ li {
 }
 
 .btn-outline-border {
-  @apply bg-transparent text-primary border border-primary;
+  @apply bg-transparent text-primary border border-primary py-3 px-11 text-lg leading-8 font-semibold transition-all duration-300 rounded-md;
 }
 
 .btn-outline-border:hover {

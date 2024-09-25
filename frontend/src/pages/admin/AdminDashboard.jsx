@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import ManagePets from './ManagePets';
 import ManageUsers from './ManageUsers';
 import AdoptionRequests from './AdoptionRequests';
-import SystemSettings from './SystemSettings';
 
 const AdminDashboard = () => {
     const [activeSection, setActiveSection] = useState('users');
@@ -40,14 +39,6 @@ const AdminDashboard = () => {
                             Adoption Requests
                         </button>
                     </li>
-                    <li>
-                        <button
-                            className={`w-full text-left p-2 rounded hover:bg-gray-700 ${activeSection === 'settings' ? 'bg-gray-600' : ''}`}
-                            onClick={() => handleSectionChange('settings')}
-                        >
-                            System Settings
-                        </button>
-                    </li>
                 </ul>
             </div>
 
@@ -71,13 +62,6 @@ const AdminDashboard = () => {
                     <div>
                         <h2 className="text-2xl font-bold mb-3">Adoption Requests</h2>
                         <AdoptionRequests />
-                    </div>
-                )}
-
-                {activeSection === 'settings' && (
-                    <div>
-                        <h2 className="text-2xl font-bold mb-3">System Settings</h2>
-                        <SystemSettings />
                     </div>
                 )}
             </div>

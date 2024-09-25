@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 const AdoptionRequests = () => {
-  // Dummy data to simulate adoption requests
   const [requests, setRequests] = useState([
     {
       id: 1,

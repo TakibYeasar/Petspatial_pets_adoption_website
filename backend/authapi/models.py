@@ -55,7 +55,7 @@ class CustomUser(AbstractBaseUser):
     last_login = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     role = models.CharField(
-        max_length=10, choices=ROLE_CHOICES, default='patient')
+        max_length=10, choices=ROLE_CHOICES, default='adopter')
 
     objects = CustomUserManager()
 

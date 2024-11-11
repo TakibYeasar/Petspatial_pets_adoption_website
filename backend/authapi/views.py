@@ -25,13 +25,12 @@ class RegisterView(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
 
-        # Create the user
-        user = CustomUser.objects.create_user(**validated_data)
+        # Save the user with the validated data from the serializer
+        user = serializer.save()
 
-        # Automatically approve patient role
-        if user.role == 'patient':
+        # Automatically approve 'adopter' role
+        if user.role == 'adopter':
             user.is_approved = True
         user.save()
 
@@ -42,6 +41,7 @@ class RegisterView(APIView):
             'data': serializer.data,
             'message': 'Thanks for signing up! A passcode has been sent to verify your email.'
         }, status=status.HTTP_201_CREATED)
+
 
 
 class VerifyUserEmail(APIView):

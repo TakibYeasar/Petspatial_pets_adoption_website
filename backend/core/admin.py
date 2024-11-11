@@ -1,3 +1,11 @@
 from django.contrib import admin
+from .models import Pet
 
-# Register your models here.
+
+@admin.register(Pet)
+class PetAdmin(admin.ModelAdmin):
+    list_display = ('name', 'age', 'breed', 'size',
+                    'adopt_status', 'publisher')
+    search_fields = ('name', 'breed')
+    list_filter = ('size', 'adopt_status', 'health_status')
+

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSwipeable } from 'react-swipeable';
-import b1 from "../../public/assets/images/banner1.jpg";
-import b2 from "../../public/assets/images/banner2.jpg";
-import b3 from "../../public/assets/images/banner3.jpg";
+import b1 from "../../../public/assets/images/banner1.jpg";
+import b2 from "../../../public/assets/images/banner2.jpg";
+import b3 from "../../../public/assets/images/banner3.jpg";
 
 const slides = [
   {
@@ -26,7 +26,7 @@ const slides = [
   },
 ];
 
-const Slider = () => {
+const SliderSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Auto-slide effect
@@ -97,4 +97,4 @@ const Slider = () => {
   );
 };
 
-export default Slider;
+export default SliderSection;

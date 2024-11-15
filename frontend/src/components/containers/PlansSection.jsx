@@ -48,7 +48,7 @@ const plansData = [
   },
 ];
 
-const Plans = () => {
+const PlansSection = () => {
   return (
     <section className="bg-gray-50 py-10" id="pricing">
       <div className="container mx-auto px-4">
@@ -102,4 +102,4 @@ const Plans = () => {
   );
 };
 
-export default Plans;
+export default PlansSection;

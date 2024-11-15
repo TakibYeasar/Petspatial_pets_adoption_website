@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Banner = () => {
+const BannerSection = () => {
   return (
     <section
       className="relative py-10 lg:py-20 bg-cover bg-center flex items-center"
@@ -53,4 +53,4 @@ const Banner = () => {
   );
 };
 
-export default Banner;
+export default BannerSection;

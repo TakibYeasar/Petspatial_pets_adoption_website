@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import PetDetails from './PetDetails';
+import {PetDetails} from '../../components';
 
 // Sample data for pets
 const pets = [
@@ -33,7 +33,7 @@ const pets = [
   // Add more pets as needed
 ];
 
-const Pets = () => {
+const PetsSection = () => {
   const [selectedPet, setSelectedPet] = useState(null);
 
   const handlePetClick = (pet) => {
@@ -65,4 +65,4 @@ const Pets = () => {
   );
 };
 
-export default Pets;
+export default PetsSection;

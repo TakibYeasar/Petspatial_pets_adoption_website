@@ -10,7 +10,7 @@ const featuresData = [
   { icon: <FaUserMd />, title: 'Pet Grooming' },
 ];
 
-const Features = () => {
+const FeaturesSection = () => {
   return (
     <section className="bg-gray-50 py-5" id="features">
       <div className="container mx-auto py-10">
@@ -33,4 +33,4 @@ const Features = () => {
   );
 };
 
-export default Features;
+export default FeaturesSection;

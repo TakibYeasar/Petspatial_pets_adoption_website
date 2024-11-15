@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import team1 from "../../public/assets/images/team1.jpg";
-import team2 from "../../public/assets/images/team2.jpg";
-import team3 from "../../public/assets/images/team3.jpg";
-import team4 from "../../public/assets/images/team4.jpg";
-import team5 from "../../public/assets/images/team5.jpg";
-import team6 from "../../public/assets/images/team6.jpg";
+import team1 from "../../../public/assets/images/team1.jpg";
+import team2 from "../../../public/assets/images/team2.jpg";
+import team3 from "../../../public/assets/images/team3.jpg";
+import team4 from "../../../public/assets/images/team4.jpg";
+import team5 from "../../../public/assets/images/team5.jpg";
+import team6 from "../../../public/assets/images/team6.jpg";
 
 const testimonials = [
   {
@@ -52,7 +52,7 @@ const testimonials = [
   }
 ];
 
-const Review = () => {
+const ReviewSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
@@ -143,4 +143,4 @@ const Review = () => {
   );
 };
 
-export default Review;
+export default ReviewSection;

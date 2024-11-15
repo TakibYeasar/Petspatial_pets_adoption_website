@@ -1,8 +1,8 @@
 import React from 'react';
-import { Team } from '../containers';
+import { TeamSection } from '../../components';
 import { FaAmbulance, FaAmericanSignLanguageInterpreting, FaArrowRight, FaUserMd } from "react-icons/fa";
-import b5 from "../../public/assets/images/b5.jpg";
-import b3 from '../../public/assets/images/b3.jpg';
+import b5 from "../../../public/assets/images/b5.jpg";
+import b3 from '../../../public/assets/images/b3.jpg';
 
 const Aboutpage = () => {
   return (
@@ -92,7 +92,7 @@ const Aboutpage = () => {
         </div>
       </section>
 
-      <Team />
+      <TeamSection />
     </div>
   )
 }

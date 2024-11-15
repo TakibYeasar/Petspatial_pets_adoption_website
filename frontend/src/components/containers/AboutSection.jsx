@@ -1,8 +1,8 @@
 import React from 'react';
-import b1 from "../../public/assets/images/b1.jpg";
-import b2 from "../../public/assets/images/b2.jpg";
+import b1 from "../../../public/assets/images/b1.jpg";
+import b2 from "../../../public/assets/images/b2.jpg";
 
-const About = () => {
+const AboutSection = () => {
   return (
     <section className="bg-gray-100" id="about">
       <div className="py-10 md:py-16">
@@ -55,4 +55,4 @@ const About = () => {
   )
 }
 
-export default About;
+export default AboutSection;

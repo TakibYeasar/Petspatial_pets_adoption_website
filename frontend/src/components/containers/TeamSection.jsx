@@ -1,13 +1,13 @@
 import React from 'react';
 import { FaFacebook, FaTwitter } from 'react-icons/fa';
-import team1 from '../../public/assets/images/team1.jpg';
-import team2 from '../../public/assets/images/team2.jpg';
-import team3 from '../../public/assets/images/team3.jpg';
-import team4 from '../../public/assets/images/team4.jpg';
-import team5 from '../../public/assets/images/team5.jpg';
-import team6 from '../../public/assets/images/team6.jpg';
+import team1 from '../../../public/assets/images/team1.jpg';
+import team2 from '../../../public/assets/images/team2.jpg';
+import team3 from '../../../public/assets/images/team3.jpg';
+import team4 from '../../../public/assets/images/team4.jpg';
+import team5 from '../../../public/assets/images/team5.jpg';
+import team6 from '../../../public/assets/images/team6.jpg';
 
-const Team = () => {
+const TeamSection = () => {
   return (
     <section className="bg-gray-200 py-10" id="team">
       <div className="container mx-auto py-5">
@@ -43,4 +43,4 @@ const Team = () => {
   );
 };
 
-export default Team;
+export default TeamSection;

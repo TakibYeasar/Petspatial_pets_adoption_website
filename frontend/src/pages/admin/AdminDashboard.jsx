@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import ManagePets from './ManagePets';
-import ManageUsers from './ManageUsers';
-import AdoptionRequests from './AdoptionRequests';
+import { ManagePets, ManageUsers, AdoptionRequests } from '../../components';
 
 const AdminDashboard = () => {
     const [activeSection, setActiveSection] = useState('users');

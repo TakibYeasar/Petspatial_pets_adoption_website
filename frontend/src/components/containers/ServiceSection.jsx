@@ -1,8 +1,8 @@
 import React from 'react';
 import { FaArrowRight } from 'react-icons/fa';
-import b3 from '../../public/assets/images/b3.jpg';
-import banner2 from '../../public/assets/images/banner2.jpg';
-import ab2 from '../../public/assets/images/ab2.jpg';
+import b3 from '../../../public/assets/images/b3.jpg';
+import banner2 from '../../../public/assets/images/banner2.jpg';
+import ab2 from '../../../public/assets/images/ab2.jpg';
 
 const progressData = [
   { label: 'Professionalism', value: 80 },
@@ -10,7 +10,7 @@ const progressData = [
   { label: 'Reliability', value: 75 },
 ];
 
-const Service = () => {
+const ServiceSection = () => {
   return (
     <div className="service-section">
       <div className="relative min-h-[260px] bg-center bg-cover bg-no-repeat bg-[url('../../public/assets/images/banner2.jpg')]">
@@ -94,4 +94,4 @@ const Service = () => {
   );
 };
 
-export default Service;
+export default ServiceSection;

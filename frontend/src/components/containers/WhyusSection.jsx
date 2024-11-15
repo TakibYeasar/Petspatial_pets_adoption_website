@@ -1,8 +1,8 @@
 import React from 'react';
-import b3 from '../../public/assets/images/b3.jpg';
+import b3 from '../../../public/assets/images/b3.jpg';
 import { FaCheck } from 'react-icons/fa';
 
-const Whyus = () => {
+const WhyusSection = () => {
   return (
     <section className="bg-gray-100 py-5" id="about1">
       <div className="container py-5">
@@ -42,4 +42,4 @@ const Whyus = () => {
   );
 };
 
-export default Whyus;
+export default WhyusSection;

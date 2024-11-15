@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import CreatePet from "./CreatePet";
-import MyPublishedPets from "./MyPublishedPets";
-import MyPublishingRequests from "./MyPublishingRequests";
+import { CreatePet, MyPublishedPets, MyPublishingRequests } from "../../components";
 
 const PublisherDashboard = () => {
     const [activeSection, setActiveSection] = useState('publish');

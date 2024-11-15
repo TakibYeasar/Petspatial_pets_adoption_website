@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import MyAdoptedPets from './MyAdoptedPets';
-import MyAdoptionRequests from './MyAdoptionRequests';
+import { MyAdoptedPets, MyAdoptionRequests } from '../../components';
 
 const AdopterDashboard = () => {
     const [activeSection, setActiveSection] = useState('browse');

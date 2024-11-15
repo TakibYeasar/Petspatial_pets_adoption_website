@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PetDetails from '../containers/PetDetails';
+import {PetDetails} from '../../components';
 
 const allPets = [
     {

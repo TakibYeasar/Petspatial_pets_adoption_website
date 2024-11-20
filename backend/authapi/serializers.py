@@ -61,6 +61,22 @@ class LoginSerializer(serializers.Serializer):
         }
 
 
+class LogoutUserSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField()
+
+    def validate(self, attrs):
+        self.token = attrs.get('refresh_token')
+        return attrs
+
+    def save(self):
+        try:
+            token = RefreshToken(self.token)
+            token.blacklist()
+        except TokenError:
+            raise serializers.ValidationError(
+                {'detail': 'Token is expired or invalid.'})
+
+
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=255)
 
@@ -75,14 +91,13 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             relative_link = reverse(
                 'password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
             abslink = f"http://{current_site}{relative_link}"
+            mail_subject = "Reset your Password"
             email_body = f"Hi {
-                user.first_name} use the link below to reset your password {abslink}"
-            data = {
-                'email_body': email_body,
-                'email_subject': "Reset your Password",
-                'to_email': user.email
-            }
-            send_email(data)
+                user.first_name}, use the link below to reset your password:\n\n{abslink}"
+
+            # Call send_email with the correct arguments
+            send_email(request, mail_subject, user)
+
         except CustomUser.DoesNotExist:
             raise serializers.ValidationError("No user found with this email.")
 
@@ -150,19 +165,3 @@ class ChangePasswordSerializer(serializers.Serializer):
         user = self.context['request'].user
         user.set_password(self.validated_data['password'])
         user.save()
-
-
-class LogoutUserSerializer(serializers.Serializer):
-    refresh_token = serializers.CharField()
-
-    def validate(self, attrs):
-        self.token = attrs.get('refresh_token')
-        return attrs
-
-    def save(self):
-        try:
-            token = RefreshToken(self.token)
-            token.blacklist()
-        except TokenError:
-            raise serializers.ValidationError(
-                {'detail': 'Token is expired or invalid.'})

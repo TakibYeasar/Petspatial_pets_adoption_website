@@ -6,10 +6,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/auth/", include('authapi.urls')),
+    path("api/user/", include('user.urls')),
     path("api/core/", include('core.urls')),
-    path("api/adminuser/", include('adminuser.urls')),
-    path("api/adopter/", include('adopter.urls')),
-    path("api/publisher/", include('publisher.urls')),
+    path("api/pets/", include('pets.urls')),
 ]
 
 if settings.DEBUG:

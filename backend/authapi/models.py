@@ -33,8 +33,8 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser):
     ROLE_CHOICES = (
-        ('publisher', 'Publisher'),
         ('adopter', 'Adopter'),
+        ('publisher', 'Publisher'),
     )
     id = models.BigAutoField(primary_key=True, editable=False)
     email = models.EmailField(
@@ -55,7 +55,7 @@ class CustomUser(AbstractBaseUser):
     last_login = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     role = models.CharField(
-        max_length=10, choices=ROLE_CHOICES, default='adopter')
+        max_length=10, choices=ROLE_CHOICES, default='patient')
 
     objects = CustomUserManager()
 

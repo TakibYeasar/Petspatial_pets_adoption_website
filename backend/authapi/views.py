@@ -29,7 +29,7 @@ class RegisterView(APIView):
         # Save the user with the validated data from the serializer
         user = serializer.save()
 
-        # Automatically approve 'adopter' role
+        # Automatically approve 'user' role
         if user.role == 'adopter':
             user.is_approved = True
         user.save()
@@ -41,7 +41,6 @@ class RegisterView(APIView):
             'data': serializer.data,
             'message': 'Thanks for signing up! A passcode has been sent to verify your email.'
         }, status=status.HTTP_201_CREATED)
-
 
 
 class VerifyUserEmail(APIView):
@@ -73,6 +72,17 @@ class LoginUserView(APIView):
             data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class LogoutApiView(APIView):
+    serializer_class = LogoutUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()  # This will blacklist the token
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PasswordResetRequestView(APIView):
@@ -119,21 +129,3 @@ class ChangePasswordView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
-
-
-class TestingAuthenticatedReq(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        return Response({'msg': 'It works'}, status=status.HTTP_200_OK)
-
-
-class LogoutApiView(APIView):
-    serializer_class = LogoutUserSerializer
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()  # This will blacklist the token
-        return Response(status=status.HTTP_204_NO_CONTENT)

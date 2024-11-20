@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaBars, FaSearch, FaTimes } from "react-icons/fa";
 import { BsSun, BsMoon } from "react-icons/bs";
 
-const Navbar = () => {
+const Navbar = ({ user, isAuthenticated }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [theme, setTheme] = useState('light-theme');

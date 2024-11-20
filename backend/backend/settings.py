@@ -16,7 +16,6 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-zje5t+4fis4^a%9yckczq$lght3k233d+i@0-y6jf8%m92mi7v'
+SECRET_KEY = 'django-insecure-e)&ebh3vebsly@4#omsf)p!kexjsb16n1)p5m9fk-0-pj3_u(g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,11 +46,12 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     "corsheaders",
     "authapi",
+    "user",
     "core",
-    "adminuser",
-    "adopter",
-    "publisher",
+    "pets",
 ]
+
+AUTH_USER_MODEL = 'authapi.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

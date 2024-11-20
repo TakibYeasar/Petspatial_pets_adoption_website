@@ -5,6 +5,7 @@ export { default as Footer } from "./Footer";
 
 // components / auth
 export { default as SignUp } from "./containers/Auth/SignUp";
+export { default as EmailVerification } from "./containers/Auth/EmailVerification";
 export { default as SignIn } from "./containers/Auth/SignIn";
 export { default as ForgotPassword } from "./containers/Auth/ForgotPassword";
 export { default as ResetPassword } from "./containers/Auth/ResetPassword";

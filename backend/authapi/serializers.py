@@ -1,15 +1,15 @@
-from rest_framework import serializers, exceptions
-from .models import CustomUser
-from .utils import send_email
+from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from django.contrib.auth import authenticate
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import smart_bytes, force_str
-from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from rest_framework.exceptions import AuthenticationFailed
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from .models import CustomUser
+from .utils import send_email
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from django.contrib.auth.password_validation import validate_password
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -28,7 +28,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         if attrs['password'] != attrs['confirm_password']:
-            raise serializers.ValidationError("Passwords do not match.")
+            raise ValidationError("Passwords do not match.")
         return attrs
 
     def create(self, validated_data):
@@ -73,8 +73,7 @@ class LogoutUserSerializer(serializers.Serializer):
             token = RefreshToken(self.token)
             token.blacklist()
         except TokenError:
-            raise serializers.ValidationError(
-                {'detail': 'Token is expired or invalid.'})
+            raise ValidationError({'detail': 'Token is expired or invalid.'})
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):
@@ -95,11 +94,10 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             email_body = f"Hi {
                 user.first_name}, use the link below to reset your password:\n\n{abslink}"
 
-            # Call send_email with the correct arguments
             send_email(request, mail_subject, user)
 
         except CustomUser.DoesNotExist:
-            raise serializers.ValidationError("No user found with this email.")
+            raise ValidationError("No user found with this email.")
 
         return attrs
 
@@ -117,7 +115,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
         confirm_password = attrs.get('confirm_password')
 
         if password != confirm_password:
-            raise serializers.ValidationError("Passwords do not match.")
+            raise ValidationError("Passwords do not match.")
 
         uidb64 = attrs.get('uidb64')
         token = attrs.get('token')
@@ -151,12 +149,11 @@ class ChangePasswordSerializer(serializers.Serializer):
     def validate(self, attrs):
         user = self.context['request'].user
         if not user.check_password(attrs['current_password']):
-            raise serializers.ValidationError(
+            raise ValidationError(
                 {"current_password": "Current password is incorrect."})
 
         if attrs['password'] != attrs['confirm_password']:
-            raise serializers.ValidationError(
-                {"detail": "Passwords do not match!"})
+            raise ValidationError({"detail": "Passwords do not match!"})
 
         validate_password(attrs['password'])  # Validate the new password
         return attrs

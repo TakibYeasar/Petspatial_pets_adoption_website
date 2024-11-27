@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -24,15 +24,18 @@ class CustomUserManager(BaseUserManager):
             password=password,
             **extra_fields,
         )
-        user.is_admin = True
+        
         user.is_staff = True
         user.is_superuser = True
+        user.is_verified = True
+        user.is_approved = True
         user.save(using=self._db)
         return user
 
 
-class CustomUser(AbstractBaseUser):
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
+        ('admin', 'Admin'),
         ('adopter', 'Adopter'),
         ('publisher', 'Publisher'),
     )
@@ -47,7 +50,6 @@ class CustomUser(AbstractBaseUser):
     last_name = models.CharField(max_length=200, blank=True, null=True)
     password = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
@@ -55,7 +57,7 @@ class CustomUser(AbstractBaseUser):
     last_login = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     role = models.CharField(
-        max_length=10, choices=ROLE_CHOICES, default='patient')
+        max_length=10, choices=ROLE_CHOICES, default='adopter')
 
     objects = CustomUserManager()
 
@@ -72,10 +74,12 @@ class CustomUser(AbstractBaseUser):
         return self.username
 
     def has_perm(self, perm, obj=None):
-        return self.is_admin
+        # Check if the user is a superuser
+        return self.is_superuser
 
     def has_module_perms(self, app_label):
-        return True
+        # Check if the user has permissions to access the app
+        return self.is_superuser or self.is_staff
 
 
 class OneTimePassword(models.Model):

@@ -1,7 +1,7 @@
 from django.db import models
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from datetime import date
+from django.conf import settings
 
 
 class Gender(models.TextChoices):
@@ -37,8 +37,11 @@ class VaccinationStatus(models.TextChoices):
 
 
 class Pet(models.Model):
+    id = models.BigAutoField(primary_key=True, editable=False)
+    publisher = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="published_pets")
     name = models.CharField(_("Name"), max_length=255)
-    image = models.URLField(_("Image URL"))
+    image = models.ImageField(_("Image URL"), blank=True, null=True)
     birth_date = models.DateField(_("Birth Date"), null=True, blank=True)
     description = models.TextField(_("Description"), null=True, blank=True)
     gender = models.CharField(
@@ -68,10 +71,9 @@ class Pet(models.Model):
     adopt_status = models.CharField(
         _("Adoption Status"), choices=PetAdoptStatus.choices, default=PetAdoptStatus.AVAILABLE
     )
-    publisher = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="published_pets")
     is_adopted = models.BooleanField(_("Is Adopted"), default=False)
     is_booked = models.BooleanField(_("Is Booked"), default=False)
+    is_approved = models.BooleanField(_("Is Approved"), default=False)
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated At"), auto_now=True)
 
@@ -89,3 +91,5 @@ class Pet(models.Model):
         verbose_name = _("Pet")
         verbose_name_plural = _("Pets")
         ordering = ['-created_at']
+
+

@@ -7,6 +7,7 @@ from pets.serializers import PetSerializer
 from .models import Adopter, Publisher
 from .serializers import AdopterSerializer, PublisherSerializer
 from authapi.models import CustomUser
+from rest_framework.exceptions import NotFound
 
 
 class UserProfileView(APIView):
@@ -19,17 +20,23 @@ class UserProfileView(APIView):
         user = request.user
 
         if user.role == "adopter":
-            adopter = Adopter.objects.filter(user=user)
-            serializer = AdopterSerializer(adopter)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            try:
+                adopter = Adopter.objects.get(user=user)
+                serializer = AdopterSerializer(adopter)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Adopter.DoesNotExist:
+                raise NotFound({"detail": "Adopter profile not found."})
 
         elif user.role == "publisher":
-            publisher = Publisher.objects.filter(user=user)
-            serializer = PublisherSerializer(publisher)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            try:
+                publisher = Publisher.objects.get(user=user)
+                serializer = PublisherSerializer(publisher)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Publisher.DoesNotExist:
+                raise NotFound({"detail": "Publisher profile not found."})
 
         return Response(
-            {"detail": "Invalid user role or profile not available."},
+            {"detail": "Invalid user role."},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -44,27 +51,34 @@ class UserProfileUpdateView(APIView):
         user = request.user
 
         if user.role == "adopter":
-            adopter = Adopter.objects.filter(user=user)
-            serializer = AdopterSerializer(
-                adopter, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                adopter = Adopter.objects.get(user=user)
+                serializer = AdopterSerializer(
+                    adopter, data=request.data, partial=True
+                )
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except Adopter.DoesNotExist:
+                raise NotFound({"detail": "Adopter profile not found."})
 
         elif user.role == "publisher":
-            publisher = Publisher.objects.filter(user=user)
-            serializer = PublisherSerializer(
-                publisher, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                publisher = Publisher.objects.get(user=user)
+                serializer = PublisherSerializer(
+                    publisher, data=request.data, partial=True
+                )
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except Publisher.DoesNotExist:
+                raise NotFound({"detail": "Publisher profile not found."})
 
         return Response(
             {"detail": "Invalid user role."}, status=status.HTTP_400_BAD_REQUEST
         )
-
 
 class AdoptedPetsListView(APIView):
     """

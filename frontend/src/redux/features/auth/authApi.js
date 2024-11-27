@@ -1,73 +1,186 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from 'axios';
+import axios from "axios";
 
-// Base url for Djagno api
-const API_URL = 'http://127.0.0.1:8000'
+// Base URL for Django API
+const API_URL = "http://127.0.0.1:8000";
 
 // Helper function for error handling
-const handleApiError = (error) => {
-    return error.response && error.response.data ? error.response.data : { message: 'An error occured. Please try again.' };
-}
+const handleApiError = (error) =>
+    error.response?.data || { message: "An error occurred. Please try again." };
+
+// Utility: Retrieve auth token from localStorage
+const getAuthToken = () => {
+    const authToken = JSON.parse(localStorage.getItem("authToken"));
+    if (!authToken || !authToken.access_token) {
+        throw new Error("No access token found");
+    }
+
+    const currentTime = Date.now();
+    if (authToken.expirationTime && currentTime > authToken.expirationTime) {
+        throw new Error("Access token has expired");
+    }
+
+    return authToken.access_token;
+};
 
 // Thunks
 
-// Fetch Current user
-export const fetchCurrentUser = createAsyncThunk('auth/fetchCurrentUser', async (_, { rejectWithValue }) => {
-    try {
-        // Retrive the authToken object fron Localstorage
-        const authToken = JSON.parse(localStorage.getItem('authToken'));
+// Fetch Current User
+export const fetchCurrentUser = createAsyncThunk(
+    "auth/fetchCurrentUser",
+    async (_, { rejectWithValue }) => {
+        try {
+            const accessToken = getAuthToken();
 
-        if (!authToken || !authToken.access_token) {
-            throw new Error('No access token found')
+            const response = await axios.get(`${API_URL}/api/auth/current-user/`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(handleApiError(error));
         }
-
-        // Check if the access token is still valid
-        const currentTime = Date.now();
-        if (authToken.expirationTime && currentTime > authToken.expirationTime) {
-            throw new Error('Access token has expired')
-        }
-
-        // Make an authenticated request to fetch the current user
-        const response = await axios.get(`${API_URL}/api/auth/current-user/`, {
-            headers: {
-                Authorization: `Bearer ${authToken.access_token}`,
-            }
-        });
-
-        // Return the user data on successful request
-        return response.data;
-
-    } catch (error) {
-        // Handle errors and reject with a meaningful message
-        return rejectWithValue(handleApiError(error));
     }
-});
-
+);
 
 // Register User
-export const registerUser = createAsyncThunk('auth/registerUser', async (formData, { rejectWithValue }) => {
-    try {
-        const response = await axios.post(`${API_URL}/api/auth/register/`, formData);
-        return response.data;
-    } catch (error) {
-        return rejectWithValue(handleApiError(error));
+export const registerUser = createAsyncThunk(
+    "auth/registerUser",
+    async (formData, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(`${API_URL}/api/auth/register/`, formData);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(handleApiError(error));
+        }
     }
-});
-
+);
 
 // Verify Email
-export const verifyEmail = createAsyncThunk('auth/verifyEmail', async (otp, { rejectWithValue }) => {
-    try {
-        const response = await axios.post(`${API_URL}/api/auth/verify-email/`, { otp });
-        return response.data;
-    } catch (error) {
-        return rejectWithValue(handleApiError(error));
+export const verifyEmail = createAsyncThunk(
+    "auth/verifyEmail",
+    async (otp, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(`${API_URL}/api/auth/verify-email/`, { otp });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(handleApiError(error));
+        }
     }
-})
+);
 
+// Login User
+export const loginUser = createAsyncThunk(
+    "auth/loginUser",
+    async ({ email, password, rememberMe }, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(`${API_URL}/api/auth/login/`, {
+                email,
+                password,
+            });
 
+            const { access_token, refresh_token, email: userEmail, role } = response.data;
 
+            const expirationTime =
+                Date.now() + (rememberMe ? 7 * 24 * 60 * 60 * 1000 : 2 * 24 * 60 * 60 * 1000); // 7 days or 2 days
 
+            const tokenData = { access_token, refresh_token, expirationTime };
 
+            localStorage.setItem("authToken", JSON.stringify(tokenData));
+            localStorage.setItem("user", JSON.stringify({ email: userEmail, role }));
 
+            return { access_token, refresh_token, email: userEmail, role };
+        } catch (error) {
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
 
+// Logout User
+export const logoutUser = createAsyncThunk(
+    "auth/logoutUser",
+    async (_, { rejectWithValue }) => {
+        try {
+            await axios.post(`${API_URL}/api/auth/logout/`);
+
+            // Clear storage on successful logout
+            localStorage.clear();
+            sessionStorage.clear();
+
+            return "Logout successful";
+        } catch (error) {
+            // Clear storage even if the API call fails
+            localStorage.clear();
+            sessionStorage.clear();
+
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+// Request Password Reset
+export const passwordReset = createAsyncThunk(
+    "auth/passwordReset",
+    async ({ email, uidb64, token }, { rejectWithValue }) => {
+        try {
+            const endpoint = email
+                ? `${API_URL}/api/auth/password-reset/`
+                : `${API_URL}/api/auth/password-reset-confirm/${uidb64}/${token}/`;
+
+            const response = await axios.post(endpoint, email ? { email } : null);
+
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+// Set New Password
+export const setNewPassword = createAsyncThunk(
+    "auth/setNewPassword",
+    async (passwordData, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(`${API_URL}/api/auth/set-new-password/`, passwordData);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+// Change Password
+export const changePassword = createAsyncThunk(
+    "auth/changePassword",
+    async (passwordData, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(`${API_URL}/api/auth/change-password/`, passwordData);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);
+
+// Refresh Token
+export const refreshToken = createAsyncThunk(
+    "auth/refreshToken",
+    async (refreshToken, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(`${API_URL}/api/auth/token/refresh/`, { refresh: refreshToken });
+
+            const { access } = response.data;
+
+            // Update access token in local storage
+            const authToken = JSON.parse(localStorage.getItem("authToken")) || {};
+            authToken.access_token = access;
+            localStorage.setItem("authToken", JSON.stringify(authToken));
+
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(handleApiError(error));
+        }
+    }
+);

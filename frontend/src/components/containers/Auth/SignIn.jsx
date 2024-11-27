@@ -1,8 +1,38 @@
-import React from "react";
-import { useNavigate } from "react-router-dom"; // For navigation
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom'; // For navigation
+import { loginUser } from '../../../redux/features/auth/authApi';
+import { resetAuthState } from '../../../redux/features/auth/authSlice';
+import { toast } from 'react-toastify';
 
 const SignIn = () => {
+    const dispatch = useDispatch();
+    const { loading, error, isAuthenticated } = useSelector((state) => state.auth); // Access auth state
     const navigate = useNavigate();
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [rememberMe, setRememberMe] = useState(false); // State for 'Remember Me' checkbox
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            toast.success('Login successful!'); // Display success toast
+            navigate('/'); // Redirect to homepage on successful login
+        }
+
+        if (error) {
+            toast.error(error.message || 'Login failed!'); // Show error message
+        }
+
+        return () => {
+            dispatch(resetAuthState()); // Reset auth state on unmount
+        };
+    }, [isAuthenticated, error, dispatch, navigate]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        dispatch(loginUser({ email, password, rememberMe })); // Dispatch login action with rememberMe flag
+    };
 
     const handleClose = () => {
         navigate("/"); // Redirect to home on close
@@ -24,15 +54,18 @@ const SignIn = () => {
                     Welcome back! Please enter your credentials to access your account.
                 </p>
 
-                <form className="" role="form">
+                <form onSubmit={handleSubmit}>
                     <div className="mb-6">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Email Address <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className="w-full p-4 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300"
                             placeholder="Enter your email"
+                            required
                         />
                     </div>
                     <div className="mb-6">
@@ -41,8 +74,11 @@ const SignIn = () => {
                         </label>
                         <input
                             type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             className="w-full p-4 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300"
                             placeholder="Enter your password"
+                            required
                         />
                     </div>
 
@@ -50,6 +86,8 @@ const SignIn = () => {
                         <label className="inline-flex items-center text-gray-700">
                             <input
                                 type="checkbox"
+                                checked={rememberMe}
+                                onChange={(e) => setRememberMe(e.target.checked)}
                                 className="form-checkbox h-4 w-4 text-primary transition duration-300"
                             />
                             <span className="ml-2 text-sm">Remember me</span>
@@ -64,9 +102,11 @@ const SignIn = () => {
 
                     <button
                         type="submit"
-                        className="w-full bg-primary text-white py-3 rounded-md shadow-lg font-medium hover:bg-secondary transition duration-300"
+                        disabled={loading}
+                        className={`w-full bg-primary text-white py-3 rounded-md shadow-lg font-medium transition duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-secondary'
+                            }`}
                     >
-                        Login
+                        {loading ? 'Logging in...' : 'Login'}
                     </button>
                 </form>
 

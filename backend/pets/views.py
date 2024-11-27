@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import status
+from rest_framework.exceptions import NotFound
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 from .models import Pet
 from .serializers import PetSerializer, PetCreateSerializer
@@ -168,30 +169,32 @@ class PetDeleteView(APIView):
         )
 
 
-
 class AdoptPetView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk, *args, **kwargs):
         try:
+            # Retrieve the pet by ID and check if its adoption status is AVAILABLE
             pet = Pet.objects.get(pk=pk, adopt_status="AVAILABLE")
-            
-            if pet.adopt_status != pet.PetAdoptStatus.AVAILABLE:
-                return Response(
-                    {"detail": "This pet is not available for adoption."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            
-            
         except Pet.DoesNotExist:
-            return Response({"detail": "Pet not available for adoption."}, status=HTTP_404_NOT_FOUND)
+            raise NotFound(
+                {"detail": "Pet not available for adoption or does not exist."})
 
+        if not pet.is_approved:
+            return Response(
+                {"detail": "This pet has not been approved for adoption."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Update the pet's adoption details
         pet.adopt_status = "ADOPTED"
         pet.is_adopted = True
+        pet.is_booked = False  # Ensure the pet is no longer booked
         pet.save()
+
         return Response(
             {"detail": f"Pet '{pet.name}' adopted successfully."},
-            status=status.HTTP_200_OK,
+            status=status.HTTP_200_OK
         )
 
 

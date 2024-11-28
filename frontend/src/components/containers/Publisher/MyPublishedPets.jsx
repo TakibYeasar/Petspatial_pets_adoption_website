@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPublishedPets } from "../../../redux/features/pets/petsApi";  // Assuming this fetches the pets from the API
+import { useNavigate } from "react-router-dom";
 
 const MyPublishedPets = () => {
-  const [publishedPets, setPublishedPets] = useState([
-    { id: 1, name: 'Charlie', type: 'Dog', age: 4, status: 'Published' },
-    { id: 2, name: 'Whiskers', type: 'Cat', age: 3, status: 'Published' },
-    { id: 3, name: 'Polly', type: 'Parrot', age: 2, status: 'Published' },
-  ]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // Get the list of published pets from Redux state
+  const { publishedPets = [], loading, error } = useSelector((state) => state.pets);
+
+  // Fetch published pets when the component mounts
+  useEffect(() => {
+    dispatch(fetchPublishedPets());
+  }, [dispatch]);
+
+  // Handling error and loading states
+  if (loading) return <p>Loading pets...</p>;
+  if (error) return <p className="text-red-500">Error loading pets: {error}</p>;
 
   return (
     <div className="container mx-auto p-4">
@@ -20,7 +32,12 @@ const MyPublishedPets = () => {
                 <p className="text-gray-600">Age: {pet.age} years</p>
                 <p className="text-sm text-green-600">Status: {pet.status}</p>
               </div>
-              <button className="bg-blue-500 text-white p-2 rounded">View Details</button>
+              <button
+                className="bg-blue-500 text-white p-2 rounded"
+                onClick={() => navigate(`/pet-details/${pet.id}`)}  // Navigate to pet details page
+              >
+                View Details
+              </button>
             </li>
           ))}
         </ul>

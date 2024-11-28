@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import getAuthToken from "../api/api";
 
 // Base URL for Django API
 const API_URL = "http://127.0.0.1:8000";
@@ -8,20 +9,6 @@ const API_URL = "http://127.0.0.1:8000";
 const handleApiError = (error) =>
     error.response?.data || { message: "An error occurred. Please try again." };
 
-// Utility: Retrieve auth token from localStorage
-const getAuthToken = () => {
-    const authToken = JSON.parse(localStorage.getItem("authToken"));
-    if (!authToken || !authToken.access_token) {
-        throw new Error("No access token found");
-    }
-
-    const currentTime = Date.now();
-    if (authToken.expirationTime && currentTime > authToken.expirationTime) {
-        throw new Error("Access token has expired");
-    }
-
-    return authToken.access_token;
-};
 
 // Thunks
 

@@ -34,31 +34,27 @@ const PublisherDashboard = () => {
                             className={`w-full text-left p-2 rounded hover:bg-blue-700 ${activeSection === 'status' ? 'bg-blue-600' : ''}`}
                             onClick={() => handleSectionChange('status')}
                         >
-                            Request Status
+                            My Published Pets
                         </button>
                     </li>
                 </ul>
             </div>
 
             <div className="w-3/4 p-5 bg-gray-100 min-h-screen">
-                <h1 className="text-3xl font-bold mb-5">Dashboard Content</h1>
                 {activeSection === 'publish' && (
                     <div>
-                        <h2 className="text-2xl font-bold mb-3">Publish Pet</h2>
                         <CreatePet />
                     </div>
                 )}
 
                 {activeSection === 'requests' && (
                     <div>
-                        <h2 className="text-2xl font-bold mb-3">My Publishing Requests</h2>
                         <MyPublishingRequests />
                     </div>
                 )}
 
                 {activeSection === 'status' && (
                     <div>
-                        <h2 className="text-2xl font-bold mb-3">Request Status</h2>
                         <MyPublishedPets />
                     </div>
                 )}

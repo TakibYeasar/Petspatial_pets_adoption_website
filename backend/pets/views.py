@@ -207,3 +207,19 @@ class AllPetsView(APIView):
         return Response(serializer.data, status=HTTP_200_OK)
 
 
+class MyPublishedPets(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        pets = Pet.objects.filter(publisher=request.user)
+        serializer = PetSerializer(pets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class MyPublishingRequestPets(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        pets = Pet.objects.filter(is_approved=False, is_adopted=False).exclude(publisher=request.user)
+        serializer = PetSerializer(pets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -1,10 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { updatePet } from "../../../redux/features/pets/petsApi";
+import { useNavigate } from "react-router-dom";
 
-const UpdatePet = ({ pet, onUpdate }) => {
+const GENDER_OPTIONS = [
+    { value: "MALE", label: "Male" },
+    { value: "FEMALE", label: "Female" },
+    { value: "UNKNOWN", label: "Unknown" },
+];
+
+const SIZE_OPTIONS = [
+    { value: "SMALL", label: "Small" },
+    { value: "MEDIUM", label: "Medium" },
+    { value: "LARGE", label: "Large" },
+];
+
+const HEALTH_STATUS_OPTIONS = [
+    { value: "HEALTHY", label: "Healthy" },
+    { value: "ILL", label: "Ill" },
+    { value: "IN_RECOVERY", label: "In Recovery" },
+    { value: "SPECIAL_CARE", label: "Requires Special Care" },
+];
+
+const UpdatePet = ({ pet }) => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { loading, error } = useSelector((state) => state.pets);
+
     const [formData, setFormData] = useState({ ...pet });
 
     useEffect(() => {
-        setFormData({ ...pet });
+        if (pet) {
+            setFormData({ ...pet });
+        }
     }, [pet]);
 
     const handleChange = (e) => {
@@ -12,41 +40,68 @@ const UpdatePet = ({ pet, onUpdate }) => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Call onUpdate with the updated pet data
-        onUpdate(formData);
+        try {
+            await dispatch(updatePet(formData)).unwrap();
+            navigate("/admin");
+        } catch (err) {
+            console.error("Failed to update pet:", err);
+        }
     };
 
     return (
         <div className="container mx-auto p-6">
             <h1 className="text-3xl font-bold mb-4">Update Pet</h1>
+            {loading && <p className="text-blue-500">Updating pet...</p>}
+            {error && <p className="text-red-500">{error}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
-                <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Pet Name"
-                    className="w-full p-2 border border-gray-300 rounded"
-                    required
-                />
-                <input
-                    type="text"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleChange}
-                    placeholder="Image URL"
-                    className="w-full p-2 border border-gray-300 rounded"
-                    required
-                />
-                <input
-                    type="date"
-                    name="birthDate"
-                    value={formData.birthDate}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded"
-                />
+                {[
+                    { name: "name", placeholder: "Pet Name", type: "text", required: true },
+                    { name: "age", placeholder: "Age (years)", type: "number", required: true },
+                    { name: "breed", placeholder: "Breed", type: "text", required: true },
+                    { name: "weight", placeholder: "Weight (kg)", type: "number", required: true },
+                    { name: "height", placeholder: "Height (cm)", type: "number", required: true },
+                    { name: "color", placeholder: "Color", type: "text", required: true },
+                    { name: "location", placeholder: "Location", type: "text", required: true },
+                ].map((field) => (
+                    <input
+                        key={field.name}
+                        type={field.type}
+                        name={field.name}
+                        value={formData[field.name]}
+                        onChange={handleChange}
+                        placeholder={field.placeholder}
+                        className="w-full p-2 border border-gray-300 rounded"
+                        required={field.required || false}
+                    />
+                ))}
+
+                {/* Select Fields */}
+                {[
+                    { name: "gender", options: GENDER_OPTIONS },
+                    { name: "size", options: SIZE_OPTIONS },
+                    { name: "health_status", options: HEALTH_STATUS_OPTIONS },
+                ].map((field) => (
+                    <select
+                        key={field.name}
+                        name={field.name}
+                        value={formData[field.name]}
+                        onChange={handleChange}
+                        className="w-full p-2 border border-gray-300 rounded"
+                    >
+                        <option value="" disabled>
+                            Select {field.name.replace("_", " ").toUpperCase()}
+                        </option>
+                        {field.options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                ))}
+
+                {/* Textarea Fields */}
                 <textarea
                     name="description"
                     value={formData.description}
@@ -55,106 +110,22 @@ const UpdatePet = ({ pet, onUpdate }) => {
                     className="w-full p-2 border border-gray-300 rounded"
                     rows="3"
                 />
-                <select
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded"
-                >
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
-                <input
-                    type="number"
-                    name="age"
-                    value={formData.age}
-                    onChange={handleChange}
-                    placeholder="Age (years)"
-                    className="w-full p-2 border border-gray-300 rounded"
-                    required
-                />
-                <input
-                    type="text"
-                    name="breed"
-                    value={formData.breed}
-                    onChange={handleChange}
-                    placeholder="Breed"
-                    className="w-full p-2 border border-gray-300 rounded"
-                    required
-                />
-                <input
-                    type="number"
-                    name="weight"
-                    value={formData.weight}
-                    onChange={handleChange}
-                    placeholder="Weight (kg)"
-                    className="w-full p-2 border border-gray-300 rounded"
-                    required
-                />
-                <input
-                    type="number"
-                    name="height"
-                    value={formData.height}
-                    onChange={handleChange}
-                    placeholder="Height (cm)"
-                    className="w-full p-2 border border-gray-300 rounded"
-                    required
-                />
-                <input
-                    type="text"
-                    name="color"
-                    value={formData.color}
-                    onChange={handleChange}
-                    placeholder="Color"
-                    className="w-full p-2 border border-gray-300 rounded"
-                    required
-                />
-                <select
-                    name="size"
-                    value={formData.size}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded"
-                >
-                    <option value="Small">Small</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Large">Large</option>
-                </select>
-                <select
-                    name="healthStatus"
-                    value={formData.healthStatus}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded"
-                >
-                    <option value="Healthy">Healthy</option>
-                    <option value="Sick">Sick</option>
-                    <option value="Injured">Injured</option>
-                </select>
                 <textarea
-                    name="specialNeeds"
-                    value={formData.specialNeeds}
+                    name="special_needs"
+                    value={formData.special_needs}
                     onChange={handleChange}
                     placeholder="Special Needs"
                     className="w-full p-2 border border-gray-300 rounded"
                     rows="2"
                 />
-                <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    placeholder="Location"
-                    className="w-full p-2 border border-gray-300 rounded"
-                />
-                <input
-                    type="text"
-                    name="publisherId"
-                    value={formData.publisherId}
-                    onChange={handleChange}
-                    placeholder="Publisher ID"
-                    className="w-full p-2 border border-gray-300 rounded"
-                />
-                <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-                    Update Pet
+
+                {/* Submit Button */}
+                <button
+                    type="submit"
+                    className={`bg-blue-500 text-white p-2 rounded ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={loading}
+                >
+                    {loading ? "Updating..." : "Update Pet"}
                 </button>
             </form>
         </div>

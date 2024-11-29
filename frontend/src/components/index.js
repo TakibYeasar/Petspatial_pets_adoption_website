@@ -25,7 +25,6 @@ export { default as ServiceSection } from "./containers/ServiceSection";
 export { default as PlansSection } from "./containers/PlansSection";
 
 // components / containers / admin
-export { default as AdoptionRequests } from "./containers/Admin/AdoptionRequests";
 export { default as ManagePets } from "./containers/Admin/ManagePets";
 export { default as ManageUsers } from "./containers/Admin/ManageUsers";
 

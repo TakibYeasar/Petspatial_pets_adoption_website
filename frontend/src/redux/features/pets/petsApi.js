@@ -22,6 +22,61 @@ export const fetchAllPets = createAsyncThunk(
     }
 );
 
+// manage pets
+export const managePetsAPI = createAsyncThunk(
+    'pets/managePetsAPI',
+    async (_, { rejectWithValue }) => {
+        try {
+            const token = getAuthToken();
+            const response = await axios.get(`${API_URL}/api/pets/manage-pets/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.message || "Failed to fetch pets");
+        }
+    }
+);
+
+// Update pet details
+export const updatePets = createAsyncThunk(
+    "pets/updatePets",
+    async (updatedPet, { rejectWithValue }) => {
+        try {
+            const token = getAuthToken();
+            const response = await axios.put(`${API_URL}/api/pets/manage-pets/`, updatedPet, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.message || "Failed to update pet");
+        }
+    }
+);
+
+// Delete pet
+export const deletePets = createAsyncThunk(
+    "pets/deletePets",
+    async (petId, { rejectWithValue }) => {
+        try {
+            const token = getAuthToken();
+            const response = await axios.delete(`${API_URL}/api/pets/manage-pets/`, {
+                data: { id: petId },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return response.data; // Return the ID to remove from the state
+        } catch (error) {
+            return rejectWithValue(error.message || "Failed to delete pet");
+        }
+    }
+);
+
 export const createPet = createAsyncThunk(
     'pets/createPet',
     async (petData, { rejectWithValue }) => {

@@ -4,10 +4,22 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from pets.models import Pet
 from pets.serializers import PetSerializer
+from authapi.serializers import UserSerializer
 from .models import Adopter, Publisher
 from .serializers import AdopterSerializer, PublisherSerializer
 from authapi.models import CustomUser
 from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
+
+
+class AllUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = CustomUser.objects.all()
+        serializer = UserSerializer(user, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class UserProfileView(APIView):
@@ -175,3 +187,68 @@ class PendingPublishingRequestsView(APIView):
         pending_pets = Pet.objects.filter(is_approved=False)
         serializer = PetSerializer(pending_pets, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ManageUsersAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        """
+        List all users.
+        """
+        if not request.user.is_staff:
+            raise PermissionDenied(
+                "You do not have permission to access this resource.")
+
+        users = CustomUser.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            raise PermissionDenied(
+                "You do not have permission to access this resource.")
+
+        user_id = request.data.get("id")
+        new_role = request.data.get("role")
+        approve_publisher = request.data.get("approve_publisher", False)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if new_role:
+            if new_role not in dict(CustomUser.ROLE_CHOICES):
+                return Response({"error": "Invalid role."}, status=status.HTTP_400_BAD_REQUEST)
+            user.role = new_role
+            user.save()
+            return Response({"message": f"User role updated to {new_role}."}, status=status.HTTP_200_OK)
+
+        if approve_publisher:
+            if user.role != "publisher":
+                return Response({"error": "User is not a publisher."}, status=status.HTTP_400_BAD_REQUEST)
+            user.is_approved = True
+            user.save()
+            return Response({"message": "Publisher approved."}, status=status.HTTP_200_OK)
+
+        return Response({"error": "Invalid operation."}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Delete a user permanently.
+        Expected payload: {"id": user_id}
+        """
+        if not request.user.is_staff:
+            raise PermissionDenied(
+                "You do not have permission to access this resource.")
+
+        user_id = request.data.get("id")
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        user.delete()
+        return Response({"message": "User deleted successfully."}, status=status.HTTP_200_OK)

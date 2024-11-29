@@ -12,6 +12,7 @@ urlpatterns = [
     path('delete-pet/<int:pk>/', PetDeleteView.as_view(), name='delete_pet'),
     path('addopt-pet/<int:pk>/', AdoptPetView.as_view(), name='adopt_pet'),
     path('all-pets/', AllPetsView.as_view(), name='all_pets'),
+    path('manage-pets/', ManagePetsView.as_view(), name='manage_pets'),
     path('published-pets/', MyPublishedPets.as_view(), name='mypublishedpets'),
     path('request-pets/', MyPublishingRequestPets.as_view(), name='mypublishingrequestpets'),
 ]

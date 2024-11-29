@@ -1,6 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
     fetchAllPets,
+    managePetsAPI,
+    updatePets,
+    deletePets,
     createPet,
     approvePet,
     updatePet,
@@ -40,6 +43,52 @@ const petsSlice = createSlice({
             .addCase(fetchAllPets.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+
+        // manage Pets
+            .addCase(managePetsAPI.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(managePetsAPI.fulfilled, (state, action) => {
+                state.loading = false;
+                state.pets = action.payload;
+            })
+            .addCase(managePetsAPI.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+        // Update Pet
+            .addCase(updatePets.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updatePets.fulfilled, (state, action) => {
+                state.loading = false;
+                const updatedPet = action.payload;
+                const petIndex = state.pets.findIndex((pet) => pet.id === updatedPet.id);
+                if (petIndex !== -1) {
+                    state.pets[petIndex] = updatedPet;
+                }
+            })
+            .addCase(updatePets.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Failed to update pet.";
+            })
+
+        // Delete Pet
+            .addCase(deletePets.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deletePets.fulfilled, (state, action) => {
+                state.loading = false;
+                state.pets = state.pets.filter((pet) => pet.id !== action.payload);
+            })
+            .addCase(deletePets.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Failed to delete pet.";
             })
 
             // Create pet

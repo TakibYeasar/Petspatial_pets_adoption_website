@@ -198,8 +198,51 @@ class AdoptPetView(APIView):
         )
 
 
+class ManagePetsView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request, *args, **kwargs):
+        """Fetch all pets."""
+        pets = Pet.objects.all()
+        serializer = PetSerializer(pets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, *args, **kwargs):
+        pet_id = request.data.get("id")
+        if not pet_id:
+            return Response(
+                {"error": "Pet ID is required for updating."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        pet = Pet.objects.filter(id=pet_id)
+
+        # Update fields if provided
+        update_fields = {}
+        for field in ["adopt_status", "is_approved"]:
+            if field in request.data:
+                update_fields[field] = request.data[field]
+
+        for key, value in update_fields.items():
+            setattr(pet, key, value)
+
+        pet.save()
+        serializer = PetSerializer(pet)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, *args, **kwargs):
+        pet_id = request.data.get("id")
+        if not pet_id:
+            return Response(
+                {"error": "Pet ID is required for deletion."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        pet = Pet.objects.filter(id=pet_id)
+        pet.delete()
+        return Response({"message": "Pet deleted successfully."}, status=status.HTTP_200_OK)
+
 class AllPetsView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         pets = Pet.objects.all()

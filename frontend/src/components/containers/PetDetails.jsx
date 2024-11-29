@@ -8,7 +8,7 @@ const PetDetails = ({ pet, onClose }) => {
                     &times;
                 </button>
                 <h2 className="text-2xl font-bold mb-4">{pet.name}</h2>
-                <img src={pet.image} alt={pet.name} className="w-full h-48 object-cover rounded-md mb-4" />
+                <img src={pet.image || '/assets/placeholder.png'} alt={pet.name} className="w-full h-48 object-cover rounded-md mb-4" />
                 <p><strong>Breed:</strong> {pet.breed}</p>
                 <p><strong>Age:</strong> {pet.age} years</p>
                 <p><strong>Gender:</strong> {pet.gender}</p>

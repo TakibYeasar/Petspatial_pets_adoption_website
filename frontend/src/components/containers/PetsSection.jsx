@@ -1,56 +1,41 @@
-import React from 'react';
-import { useState } from 'react';
-import {PetDetails} from '../../components';
-
-// Sample data for pets
-const pets = [
-  {
-    name: "Bella",
-    image: "/assets/images/pet1.jpg",
-    gender: "Female",
-    age: 2,
-    breed: "Labrador",
-    weight: 25,
-    height: 60,
-    color: "Yellow",
-    healthStatus: "Healthy",
-    location: "New York",
-    publisherId: "1"
-  },
-  {
-    name: "Max",
-    image: "/assets/images/pet2.jpg",
-    gender: "Male",
-    age: 3,
-    breed: "Beagle",
-    weight: 20,
-    height: 50,
-    color: "Brown",
-    healthStatus: "Healthy",
-    location: "Los Angeles",
-    publisherId: "2"
-  },
-  // Add more pets as needed
-];
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllPets } from '../../redux/features/pets/petsApi';
+import PetDetails from './PetDetails'; // Assuming PetDetails is in the same directory
 
 const PetsSection = () => {
   const [selectedPet, setSelectedPet] = useState(null);
+  const dispatch = useDispatch();
+  const { pets, loading, error } = useSelector((state) => state.pets);
+
+  // Fetch pets on component mount
+  useEffect(() => {
+    dispatch(fetchAllPets());
+  }, [dispatch]);
 
   const handlePetClick = (pet) => {
     setSelectedPet(pet);
   };
 
+  if (loading) {
+    return <div className="text-center p-6">Loading pets...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center p-6 text-red-500">Error: {error}</div>;
+  }
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-4">Our Pets</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {pets.map((pet, index) => (
+        {pets.map((pet) => (
           <div
-            key={index}
+            key={pet.id} // Use pet's id for the key to ensure uniqueness
             className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transition-transform transform hover:scale-105"
             onClick={() => handlePetClick(pet)}
           >
-            <img src={pet.image} alt={pet.name} className="w-full h-48 object-cover" />
+            <img src={pet.image || '/assets/placeholder.png'} alt={pet.name} className="w-full h-48 object-cover" />
             <div className="p-4">
               <h2 className="text-xl font-semibold">{pet.name}</h2>
               <p className="text-gray-600">Breed: {pet.breed}</p>

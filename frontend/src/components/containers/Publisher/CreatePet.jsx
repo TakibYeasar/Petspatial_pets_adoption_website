@@ -41,42 +41,36 @@ const CreatePet = () => {
     const { loading, error } = useSelector((state) => state.pets);
 
     const [formData, setFormData] = useState({
-        publisher: "",
         name: "",
-        image: "",
         birth_date: "",
-        description: "",
-        gender: "",
         age: "",
         breed: "",
         weight: "",
         height: "",
         color: "",
-        size: "",
-        health_status: "",
-        special_needs: "",
-        vaccination_status: "",
         microchip_id: "",
         location: "",
         adoption_fee: "",
+        description: "",
+        special_needs: "",
+        gender: "",
+        size: "",
+        health_status: "",
+        vaccination_status: "",
         adopt_status: "",
     });
 
+    const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
     const handleChange = (e) => {
         const { name, value, type, files } = e.target;
-
         if (type === "file") {
             const file = files[0];
-            setFormData({ ...formData, image: file });
+            setImage(file);
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            if (file) {
-                reader.readAsDataURL(file);
-            }
+            reader.onloadend = () => setImagePreview(reader.result);
+            if (file) reader.readAsDataURL(file);
         } else {
             setFormData({ ...formData, [name]: value });
         }
@@ -84,13 +78,20 @@ const CreatePet = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const form = new FormData();
+        for (const key in formData) {
+            form.append(key, formData[key]);
+        }
+        if (image) {
+            form.append("image", image);
+        }
+
         try {
-            await dispatch(createPet(formData)).unwrap();
+            await dispatch(createPet(form)).unwrap();
             navigate("/admin");
         } catch (err) {
             console.error("Failed to create pet:", err);
-            // Optionally set an error message to be displayed in the component
-            // dispatch(setError("There was an issue creating the pet"));
         }
     };
 
@@ -98,10 +99,49 @@ const CreatePet = () => {
         <div className="container mx-auto p-6">
             <h1 className="text-3xl font-bold mb-4">Create a New Pet</h1>
             {loading && <p className="text-blue-500">Creating pet...</p>}
-            {error && <p className="text-red-500">{error}</p>}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+                <div className="text-red-500">
+                    {typeof error === "string" ? (
+                        error
+                    ) : (
+                        <ul>
+                            {Object.entries(error).map(([key, value]) => (
+                                <li key={key}>
+                                    <strong>{key}:</strong>{" "}
+                                    {Array.isArray(value) ? value.join(", ") : value}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            )}
+
+            <form
+                onSubmit={handleSubmit}
+                className="space-y-4"
+                encType="multipart/form-data"
+            >
+                <div>
+                    <label
+                        htmlFor="name"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Pet Name
+                    </label>
+                    <input
+                        type="text"
+                        name="name"
+                        id="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="Pet Name"
+                        required
+                        className="w-full p-2 border border-gray-300 rounded"
+                    />
+                </div>
+
+                {/* Additional Inputs */}
                 {[
-                    { name: "name", placeholder: "Pet Name", type: "text", required: true },
                     { name: "birth_date", type: "date", label: "Birth Date" },
                     { name: "age", placeholder: "Age (years)", type: "number", required: true },
                     { name: "breed", placeholder: "Breed", type: "text", required: true },
@@ -112,21 +152,32 @@ const CreatePet = () => {
                     { name: "location", placeholder: "Location", type: "text" },
                     { name: "adoption_fee", placeholder: "Adoption Fee", type: "number" },
                 ].map((field) => (
-                    <input
-                        key={field.name}
-                        type={field.type}
-                        name={field.name}
-                        value={formData[field.name]}
-                        onChange={handleChange}
-                        placeholder={field.placeholder || field.label}
-                        className="w-full p-2 border border-gray-300 rounded"
-                        required={field.required || false}
-                    />
+                    <div key={field.name}>
+                        <label
+                            htmlFor={field.name}
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            {field.label || field.placeholder}
+                        </label>
+                        <input
+                            type={field.type}
+                            name={field.name}
+                            id={field.name}
+                            value={formData[field.name]}
+                            onChange={handleChange}
+                            placeholder={field.placeholder || field.label}
+                            required={field.required || false}
+                            className="w-full p-2 border border-gray-300 rounded"
+                        />
+                    </div>
                 ))}
 
-                {/* Image Upload Section */}
+                {/* Image Upload */}
                 <div>
-                    <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+                    <label
+                        htmlFor="image"
+                        className="block text-sm font-medium text-gray-700"
+                    >
                         Upload Pet Image
                     </label>
                     <input
@@ -139,11 +190,16 @@ const CreatePet = () => {
                     />
                     {imagePreview && (
                         <div className="mt-4">
-                            <img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded" />
+                            <img
+                                src={imagePreview}
+                                alt="Preview"
+                                className="w-32 h-32 object-cover rounded"
+                            />
                         </div>
                     )}
                 </div>
 
+                {/* Dropdowns */}
                 {[
                     { name: "gender", options: GENDER_OPTIONS },
                     { name: "size", options: SIZE_OPTIONS },
@@ -151,40 +207,56 @@ const CreatePet = () => {
                     { name: "vaccination_status", options: VACCINATION_STATUS_OPTIONS },
                     { name: "adopt_status", options: ADOPTION_STATUS_OPTIONS },
                 ].map((field) => (
-                    <select
-                        key={field.name}
-                        name={field.name}
-                        value={formData[field.name]}
-                        onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 rounded"
-                    >
-                        <option value="" disabled>
-                            Select {field.name.replace("_", " ").toUpperCase()}
-                        </option>
-                        {field.options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
+                    <div key={field.name}>
+                        <label
+                            htmlFor={field.name}
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            {field.name.replace("_", " ").toUpperCase()}
+                        </label>
+                        <select
+                            name={field.name}
+                            id={field.name}
+                            value={formData[field.name]}
+                            onChange={handleChange}
+                            className="w-full p-2 border border-gray-300 rounded"
+                        >
+                            <option value="" disabled>
+                                Select {field.name.replace("_", " ").toUpperCase()}
                             </option>
-                        ))}
-                    </select>
+                            {field.options.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 ))}
 
-                <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    placeholder="Description"
-                    className="w-full p-2 border border-gray-300 rounded"
-                    rows="3"
-                />
-                <textarea
-                    name="special_needs"
-                    value={formData.special_needs}
-                    onChange={handleChange}
-                    placeholder="Special Needs"
-                    className="w-full p-2 border border-gray-300 rounded"
-                    rows="2"
-                />
+                {/* Textareas */}
+                {[
+                    { name: "description", placeholder: "Description" },
+                    { name: "special_needs", placeholder: "Special Needs" },
+                ].map((field) => (
+                    <div key={field.name}>
+                        <label
+                            htmlFor={field.name}
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            {field.placeholder}
+                        </label>
+                        <textarea
+                            name={field.name}
+                            id={field.name}
+                            value={formData[field.name]}
+                            onChange={handleChange}
+                            placeholder={field.placeholder}
+                            className="w-full p-2 border border-gray-300 rounded"
+                            rows="3"
+                        />
+                    </div>
+                ))}
+
                 <button
                     type="submit"
                     className={`bg-blue-500 text-white p-2 rounded ${loading ? "opacity-50 cursor-not-allowed" : ""}`}

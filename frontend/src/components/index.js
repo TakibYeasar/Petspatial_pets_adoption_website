@@ -38,5 +38,4 @@ export { default as MyAdoptionRequests } from "./containers/Adopter/MyAdoptionRe
 export { default as CreatePet } from "./containers/Publisher/CreatePet";
 export { default as MyPublishedPets } from "./containers/Publisher/MyPublishedPets";
 export { default as MyPublishingRequests } from "./containers/Publisher/MyPublishingRequests";
-export { default as UpdatePet } from "./containers/Publisher/UpdatePet";
 

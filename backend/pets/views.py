@@ -257,6 +257,15 @@ class MyPublishedPets(APIView):
         pets = Pet.objects.filter(publisher=request.user)
         serializer = PetSerializer(pets, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def put(self, request):
+        pet_id = request.data.get("id")
+        pet = Pet.objects.filter(id=pet_id, publisher=request.user)
+        serializer = PetCreateSerializer(pet, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 class MyPublishingRequestPets(APIView):
@@ -266,3 +275,4 @@ class MyPublishingRequestPets(APIView):
         pets = Pet.objects.filter(is_approved=False, is_adopted=False).exclude(publisher=request.user)
         serializer = PetSerializer(pets, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+

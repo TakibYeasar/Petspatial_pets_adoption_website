@@ -1,41 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom'; // For navigation
-import { loginUser } from '../../../redux/features/auth/authApi';
-import { resetAuthState } from '../../../redux/features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
+import { useLoginMutation } from '../../../redux/features/auth/authApi';
 import { toast } from 'react-toastify';
 
 const SignIn = () => {
-    const dispatch = useDispatch();
-    const { loading, error, isAuthenticated } = useSelector((state) => state.auth); // Access auth state
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // Corrected hook for navigation in React Router v6
+    const [login, { isLoading, error, data }] = useLoginMutation();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [rememberMe, setRememberMe] = useState(false); // State for 'Remember Me' checkbox
+    const [rememberMe, setRememberMe] = useState(false);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            toast.success('Login successful!'); // Display success toast
-            navigate('/'); // Redirect to homepage on successful login
+        if (data) {
+            toast.success('Login successful!');
+            navigate('/'); // Navigate to home on success
         }
 
         if (error) {
-            toast.error(error.message || 'Login failed!'); // Show error message
+            toast.error(error.data?.detail || 'Login failed!');
         }
-
-        return () => {
-            dispatch(resetAuthState()); // Reset auth state on unmount
-        };
-    }, [isAuthenticated, error, dispatch, navigate]);
+    }, [data, error, navigate]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch(loginUser({ email, password, rememberMe })); // Dispatch login action with rememberMe flag
+        login({ email, password, rememberMe });
     };
 
     const handleClose = () => {
-        navigate("/"); // Redirect to home on close
+        navigate('/'); // Close modal and go back to home
     };
 
     return (
@@ -102,11 +95,10 @@ const SignIn = () => {
 
                     <button
                         type="submit"
-                        disabled={loading}
-                        className={`w-full bg-primary text-white py-3 rounded-md shadow-lg font-medium transition duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-secondary'
-                            }`}
+                        disabled={isLoading}
+                        className={`w-full bg-primary text-white py-3 rounded-md shadow-lg font-medium transition duration-300 ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-secondary'}`}
                     >
-                        {loading ? 'Logging in...' : 'Login'}
+                        {isLoading ? 'Logging in...' : 'Login'}
                     </button>
                 </form>
 

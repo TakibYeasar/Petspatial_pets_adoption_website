@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { MyAdoptedPets, MyAdoptionRequests } from '../../components';
+import { MyProfile, SavedPets, AdoptionHistory, ApplicationStatus, AccountSettings } from '../../components';
 
 const AdopterDashboard = () => {
-    const [activeSection, setActiveSection] = useState('browse');
+    const [activeSection, setActiveSection] = useState('profile');
 
     const handleSectionChange = (section) => {
         setActiveSection(section);
@@ -15,10 +15,18 @@ const AdopterDashboard = () => {
                 <ul className="space-y-4">
                     <li>
                         <button
-                            className={`w-full text-left p-2 rounded hover:bg-green-700 ${activeSection === 'requests' ? 'bg-green-600' : ''}`}
-                            onClick={() => handleSectionChange('requests')}
+                            className={`w-full text-left p-2 rounded hover:bg-green-700 ${activeSection === 'profile' ? 'bg-green-600' : ''}`}
+                            onClick={() => handleSectionChange('profile')}
                         >
-                            My Adoption Requests
+                            My Profile
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            className={`w-full text-left p-2 rounded hover:bg-green-700 ${activeSection === 'saved' ? 'bg-green-600' : ''}`}
+                            onClick={() => handleSectionChange('saved')}
+                        >
+                            Saved Pets
                         </button>
                     </li>
                     <li>
@@ -26,23 +34,52 @@ const AdopterDashboard = () => {
                             className={`w-full text-left p-2 rounded hover:bg-green-700 ${activeSection === 'adopted' ? 'bg-green-600' : ''}`}
                             onClick={() => handleSectionChange('adopted')}
                         >
-                            My Adopted Pets
+                            Adopted Pets
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            className={`w-full text-left p-2 rounded hover:bg-green-700 ${activeSection === 'request' ? 'bg-green-600' : ''}`}
+                            onClick={() => handleSectionChange('request')}
+                        >
+                            Adoption Request
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            className={`w-full text-left p-2 rounded hover:bg-green-700 ${activeSection === 'settings' ? 'bg-green-600' : ''}`}
+                            onClick={() => handleSectionChange('settings')}
+                        >
+                            Settings
                         </button>
                     </li>
                 </ul>
             </div>
 
             <div className="w-3/4 p-5 bg-gray-100 min-h-screen">
-
-                {activeSection === 'requests' && (
+                {activeSection === 'profile' && (
                     <div>
-                        <MyAdoptionRequests />
+                        <MyProfile />
                     </div>
                 )}
-
+                {activeSection === 'saved' && (
+                    <div>
+                        <SavedPets />
+                    </div>
+                )}
                 {activeSection === 'adopted' && (
                     <div>
-                        <MyAdoptedPets />
+                        <AdoptionHistory />
+                    </div>
+                )}
+                {activeSection === 'request' && (
+                    <div>
+                        <ApplicationStatus />
+                    </div>
+                )}
+                {activeSection === 'settings' && (
+                    <div>
+                        <AccountSettings />
                     </div>
                 )}
             </div>

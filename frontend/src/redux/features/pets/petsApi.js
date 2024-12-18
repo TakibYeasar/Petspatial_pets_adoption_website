@@ -1,186 +1,115 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import getAuthToken from "../api/api";
+import { apiSlice } from "../../api/api";
+import { PETS_URL } from "../../constant";
 
-// Base URL for Django API
-const API_URL = "http://127.0.0.1:8000";
+export const petsApi = apiSlice.injectEndpoints({
+    endpoints: (builder) => ({
+        // Manage all pets
+        managePets: builder.query({
+            query: () => ({
+                url: `${PETS_URL}/manage-pets/`,
+            }),
+        }),
 
-// Helper function for error handling
-const handleApiError = (error) =>
-    error.response?.data || { message: "An error occurred. Please try again." };
+        // Approve a pet by its ID
+        approvePet: builder.mutation({
+            query: (id) => ({
+                url: `${PETS_URL}/pets/${id}/approve/`,
+                method: "PUT",
+            }),
+        }),
 
-// Thunks for pet-related actions
-export const fetchAllPets = createAsyncThunk(
-    'pets/fetchAllPets',
-    async (_, { rejectWithValue }) => {
-        try {
-            const response = await axios.get(`${API_URL}/api/pets/all-pets/`);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.message || "Failed to fetch pets");
-        }
-    }
-);
+        // Edit approval status of a pet by its ID
+        editApproval: builder.mutation({
+            query: (id) => ({
+                url: `${PETS_URL}/pets/${id}/edit-approval/`,
+                method: "PUT",
+            }),
+        }),
 
-// manage pets
-export const managePetsAPI = createAsyncThunk(
-    'pets/managePetsAPI',
-    async (_, { rejectWithValue }) => {
-        try {
-            const token = getAuthToken();
-            const response = await axios.get(`${API_URL}/api/pets/manage-pets/`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.message || "Failed to fetch pets");
-        }
-    }
-);
+        // Remove a pet by its ID
+        removePet: builder.mutation({
+            query: (id) => ({
+                url: `${PETS_URL}/pets/${id}/remove/`,
+                method: "DELETE",
+            }),
+        }),
 
-// Update pet details
-export const updatePets = createAsyncThunk(
-    "pets/updatePets",
-    async (updatedPet, { rejectWithValue }) => {
-        try {
-            const token = getAuthToken();
-            const response = await axios.put(`${API_URL}/api/pets/manage-pets/`, updatedPet, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.message || "Failed to update pet");
-        }
-    }
-);
+        // Create a new pet
+        createPet: builder.mutation({
+            query: (petData) => ({
+                url: `${PETS_URL}/create-pets/`,
+                method: "POST",
+                body: petData,
+            }),
+        }),
 
-// Delete pet
-export const deletePets = createAsyncThunk(
-    "pets/deletePets",
-    async (petId, { rejectWithValue }) => {
-        try {
-            const token = getAuthToken();
-            const response = await axios.delete(`${API_URL}/api/pets/manage-pets/`, {
-                data: { id: petId },
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            return response.data; // Return the ID to remove from the state
-        } catch (error) {
-            return rejectWithValue(error.message || "Failed to delete pet");
-        }
-    }
-);
+        // Update a pet by its ID
+        updatePet: builder.mutation({
+            query: ({ id, petData }) => ({
+                url: `${PETS_URL}/update-pet/${id}/`,
+                method: "PUT",
+                body: petData,
+            }),
+        }),
 
-export const createPet = createAsyncThunk(
-    'pets/createPet',
-    async (petData, { rejectWithValue }) => {
-        try {
-            const accessToken = getAuthToken();
+        // Delete a pet by its ID
+        deletePet: builder.mutation({
+            query: (id) => ({
+                url: `${PETS_URL}/delete-pet/${id}/`,
+                method: "DELETE",
+            }),
+        }),
 
-            const response = await axios.post(
-                `${API_URL}/api/pets/create-pets/`,
-                petData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
+        // Fetch all pets
+        fetchAllPets: builder.query({
+            query: () => ({
+                url: `${PETS_URL}/all-pets/`,
+            }),
+        }),
 
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data || error.message || "Failed to create pet");
-        }
-    }
-);
+        // Fetch a single pet by its ID
+        fetchSinglePet: builder.query({
+            query: (id) => ({
+                url: `${PETS_URL}/single-pet/${id}/`,
+            }),
+        }),
 
-export const approvePet = createAsyncThunk(
-    'pets/approvePet',
-    async (petId, { rejectWithValue }) => {
-        try {
-            const response = await axios.patch(`${API_URL}/api/pets/approve-pet/${petId}/`);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.message || "Failed to approve pet");
-        }
-    }
-);
+        // Adopt a pet by its ID
+        adoptPet: builder.mutation({
+            query: (id) => ({
+                url: `${PETS_URL}/adopt-pet/${id}/`,
+                method: "POST",
+            }),
+        }),
 
-export const updatePet = createAsyncThunk(
-    'pets/updatePet',
-    async ({ petId, petData }, { rejectWithValue }) => {
-        try {
-            const response = await axios.put(`${API_URL}/api/pets/update-pet/${petId}/`, petData);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.message || "Failed to update pet");
-        }
-    }
-);
+        // Fetch adopter's adopted pets
+        fetchAdopterAdoptedPets: builder.query({
+            query: () => ({
+                url: `${PETS_URL}/adopter-adopted-pets/`,
+            }),
+        }),
 
-export const deletePet = createAsyncThunk(
-    'pets/deletePet',
-    async (petId, { rejectWithValue }) => {
-        try {
-            const response = await axios.delete(`${API_URL}/api/pets/delete-pet/${petId}/`);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.message || "Failed to delete pet");
-        }
-    }
-);
+        // Fetch all publisher pets
+        publisherPets: builder.query({
+            query: () => ({
+                url: `${PETS_URL}/publisher-pets/`,
+            }),
+        }),
+    }),
+});
 
-export const adoptPet = createAsyncThunk(
-    'pets/adoptPet',
-    async (petId, { rejectWithValue }) => {
-        try {
-            const response = await axios.post(`${API_URL}/api/pets/adopt-pet/${petId}/`);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.message || "Failed to adopt pet");
-        }
-    }
-);
-
-
-export const fetchPublishedPets = createAsyncThunk(
-    'pets/fetchPublishedPets',
-    async (_, { rejectWithValue }) => {
-        try {
-            const accessToken = getAuthToken();
-            const response = await axios.get(`${API_URL}/api/pets/published-pets/`, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || "Failed to fetch published pets");
-        }
-    }
-);
-
-export const fetchPublishingRequestPets = createAsyncThunk(
-    'pets/fetchPublishingRequestPets',
-    async (_, { rejectWithValue }) => {
-        try {
-            const accessToken = getAuthToken();
-            const response = await axios.get(`${API_URL}/api/pets/request-pets/`, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || "Failed to fetch publishing request pets");
-        }
-    }
-);
+export const {
+    useManagePetsQuery,
+    useApprovePetMutation,
+    useEditApprovalMutation,
+    useRemovePetMutation,
+    useCreatePetMutation,
+    useUpdatePetMutation,
+    useDeletePetMutation,
+    useFetchAllPetsQuery,
+    useFetchSinglePetQuery,
+    useAdoptPetMutation,
+    useFetchAdopterAdoptedPetsQuery,
+    usePublisherPetsQuery,
+} = petsApi;
 

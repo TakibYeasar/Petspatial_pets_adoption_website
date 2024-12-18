@@ -53,7 +53,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
-    is_approved = models.BooleanField(default=False)
     last_login = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     role = models.CharField(

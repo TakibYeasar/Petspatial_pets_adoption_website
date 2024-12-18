@@ -3,7 +3,7 @@ import { FaBars, FaTimes } from "react-icons/fa";
 import { BsSun, BsMoon } from "react-icons/bs";
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from "react-router-dom";
-import { logoutUser } from '../redux/features/auth/authApi';
+import { useLogoutMutation } from '../redux/features/auth/authApi';
 import { toast } from 'react-toastify';
 
 const Navbar = ({ user, isAuthenticated }) => {
@@ -50,7 +50,9 @@ const Navbar = ({ user, isAuthenticated }) => {
 
   const handleLogout = async () => {
     try {
-      await dispatch(logoutUser()).unwrap();
+      await dispatch(useLogoutMutation()).unwrap();
+      localStorage.clear();
+      sessionStorage.clear();
       toast.success('Logged out successfully');
       navigate('/');
     } catch (error) {

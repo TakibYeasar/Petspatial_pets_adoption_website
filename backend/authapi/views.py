@@ -29,11 +29,6 @@ class RegisterView(APIView):
         # Save the user with the validated data from the serializer
         user = serializer.save()
 
-        # Automatically approve 'user' role
-        if user.role == 'adopter':
-            user.is_approved = True
-        user.save()
-
         # Send OTP to the user for email verification
         send_generated_otp_to_email(request, user.email)
 
@@ -62,51 +57,6 @@ class VerifyUserEmail(APIView):
 
         except OneTimePassword.DoesNotExist:
             return Response({'message': 'Invalid passcode'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ApprovePublisherView(APIView):
-    """
-    View to approve a publisher. Only admin users can perform this action.
-    """
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, user_id):
-        # Ensure only admins can approve publishers
-        if not (request.user.is_admin or request.user.role == 'admin'):
-            return Response(
-                {"error": "Only admins can approve publishers."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        try:
-            # Get the user by ID
-            user = CustomUser.objects.get(id=user_id)
-
-            # Ensure the user is a publisher
-            if user.role != 'publisher':
-                return Response(
-                    {"error": "This user is not a publisher and cannot be approved."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            # Approve the publisher
-            user.is_approved = True
-            user.save()
-
-            # Serialize the updated user and send the response
-            serializer = UserSerializer(user)
-            return Response(
-                {
-                    "data": serializer.data,
-                    "message": "Publisher approved successfully."
-                },
-                status=status.HTTP_200_OK
-            )
-        except CustomUser.DoesNotExist:
-            return Response(
-                {"error": "User not found."},
-                status=status.HTTP_404_NOT_FOUND
-            )
 
 
 class LoginUserView(APIView):

@@ -30,12 +30,14 @@ export { default as ManageUsers } from "./containers/Admin/ManageUsers";
 
 
 // components / containers / adopter
-export { default as MyAdoptedPets } from "./containers/Adopter/MyAdoptedPets";
-export { default as MyAdoptionRequests } from "./containers/Adopter/MyAdoptionRequests";
+export { default as MyProfile } from "./containers/Adopter/MyProfile";
+export { default as SavedPets } from "./containers/Adopter/SavedPets";
+export { default as AdoptionHistory } from "./containers/Adopter/AdoptionHistory";
+export { default as ApplicationStatus } from "./containers/Adopter/ApplicationStatus";
+export { default as AccountSettings } from "./containers/Adopter/AccountSettings";
 
 
 // components / containers / publisher
 export { default as CreatePet } from "./containers/Publisher/CreatePet";
-export { default as MyPublishedPets } from "./containers/Publisher/MyPublishedPets";
-export { default as MyPublishingRequests } from "./containers/Publisher/MyPublishingRequests";
+export { default as PublishingHistory } from "./containers/Publisher/PublishingHistory";
 

@@ -1,173 +1,147 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import getAuthToken from "../api/api";
+import { apiSlice } from "../../api/api";
+import { AUTH_URL } from "../../constant";
+import { resetAuthState, setTokens, setUser } from "./authSlice";
 
-// Base URL for Django API
-const API_URL = "http://127.0.0.1:8000";
+export const authApi = apiSlice.injectEndpoints({
+    endpoints: (builder) => ({
+        // Fetch the current user
+        currentUser: builder.query({
+            query: () => ({
+                url: `${AUTH_URL}/current-user/`,
+            }),
+        }),
 
-// Helper function for error handling
-const handleApiError = (error) =>
-    error.response?.data || { message: "An error occurred. Please try again." };
+        // Register a new user
+        register: builder.mutation({
+            query: (data) => ({
+                url: `${AUTH_URL}/register/`,
+                method: "POST",
+                body: data,
+            }),
+        }),
 
+        // Verify email
+        verifyEmail: builder.mutation({
+            query: (data) => ({
+                url: `${AUTH_URL}/verify-email/`,
+                method: "POST",
+                body: data,
+            }),
+        }),
 
-// Thunks
+        // Login
+        login: builder.mutation({
+            query: (data) => ({
+                url: `${AUTH_URL}/login/`,
+                method: "POST",
+                body: data,
+            }),
+            async onQueryStarted(_, { queryFulfilled, dispatch }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    const { access_token, refresh_token, email, role } = data;
 
-// Fetch Current User
-export const fetchCurrentUser = createAsyncThunk(
-    "auth/fetchCurrentUser",
-    async (_, { rejectWithValue }) => {
-        try {
-            const accessToken = getAuthToken();
+                    // Dispatch tokens and user details to the store
+                    dispatch(setTokens({ accessToken: access_token, refreshToken: refresh_token }));
+                    dispatch(setUser({ email, role }));
 
-            const response = await axios.get(`${API_URL}/api/auth/current-user/`, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
+                    // Save tokens and user info to localStorage
+                    localStorage.setItem(
+                        "authToken",
+                        JSON.stringify({ access_token, refresh_token })
+                    );
+                    localStorage.setItem("user", JSON.stringify({ email, role }));
+                } catch (error) {
+                    console.error("Login failed:", error);
+                }
+            },
+        }),
 
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
+        // Logout
+        logout: builder.mutation({
+            query: () => ({
+                url: `${AUTH_URL}/logout/`,
+                method: "POST",
+            }),
+            async onQueryStarted(_, { queryFulfilled, dispatch }) {
+                try {
+                    await queryFulfilled;
 
-// Register User
-export const registerUser = createAsyncThunk(
-    "auth/registerUser",
-    async (formData, { rejectWithValue }) => {
-        try {
-            const response = await axios.post(`${API_URL}/api/auth/register/`, formData);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
+                    // Clear state and storage
+                    dispatch(resetAuthState());
+                    localStorage.clear();
+                    sessionStorage.clear();
+                } catch (error) {
+                    console.error("Logout failed:", error);
+                }
+            },
+        }),
 
-// Verify Email
-export const verifyEmail = createAsyncThunk(
-    "auth/verifyEmail",
-    async (otp, { rejectWithValue }) => {
-        try {
-            const response = await axios.post(`${API_URL}/api/auth/verify-email/`, { otp });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
+        // Request password reset
+        requestPasswordReset: builder.mutation({
+            query: (email) => ({
+                url: `${AUTH_URL}/password-reset/`,
+                method: "POST",
+                body: { email },
+            }),
+        }),
 
-// Login User
-export const loginUser = createAsyncThunk(
-    "auth/loginUser",
-    async ({ email, password, rememberMe }, { rejectWithValue }) => {
-        try {
-            const response = await axios.post(`${API_URL}/api/auth/login/`, {
-                email,
-                password,
-            });
+        // Confirm password reset
+        confirmPasswordReset: builder.query({
+            query: ({ uidb64, token }) => ({
+                url: `${AUTH_URL}/password-reset-confirm/${uidb64}/${token}/`,
+            }),
+        }),
 
-            const { access_token, refresh_token, email: userEmail, role } = response.data;
+        // Set a new password
+        setNewPassword: builder.mutation({
+            query: (data) => ({
+                url: `${AUTH_URL}/set-new-password/`,
+                method: "PATCH",
+                body: data,
+            }),
+        }),
 
-            const expirationTime =
-                Date.now() + (rememberMe ? 7 * 24 * 60 * 60 * 1000 : 2 * 24 * 60 * 60 * 1000); // 7 days or 2 days
+        // Change password
+        changePassword: builder.mutation({
+            query: (data) => ({
+                url: `${AUTH_URL}/change-password/`,
+                method: "POST",
+                body: data,
+            }),
+        }),
 
-            const tokenData = { access_token, refresh_token, expirationTime };
+        // Refresh token
+        refreshToken: builder.mutation({
+            query: (data) => ({
+                url: `${AUTH_URL}/token/refresh/`,
+                method: "POST",
+                body: data,
+            }),
+            async onQueryStarted(_, { queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    const { access } = data;
+                    const authToken = JSON.parse(localStorage.getItem("authToken"));
+                    authToken.access_token = access;
+                    localStorage.setItem("authToken", JSON.stringify(authToken));
+                } catch (error) {
+                    console.error("Token refresh failed:", error);
+                }
+            },
+        }),
+    }),
+});
 
-            localStorage.setItem("authToken", JSON.stringify(tokenData));
-            localStorage.setItem("user", JSON.stringify({ email: userEmail, role }));
-
-            return { access_token, refresh_token, email: userEmail, role };
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
-
-// Logout User
-export const logoutUser = createAsyncThunk(
-    "auth/logoutUser",
-    async (_, { rejectWithValue }) => {
-        try {
-            await axios.post(`${API_URL}/api/auth/logout/`);
-
-            // Clear storage on successful logout
-            localStorage.clear();
-            sessionStorage.clear();
-
-            return "Logout successful";
-        } catch (error) {
-            // Clear storage even if the API call fails
-            localStorage.clear();
-            sessionStorage.clear();
-
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
-
-// Request Password Reset
-export const passwordReset = createAsyncThunk(
-    "auth/passwordReset",
-    async ({ email, uidb64, token }, { rejectWithValue }) => {
-        try {
-            const endpoint = email
-                ? `${API_URL}/api/auth/password-reset/`
-                : `${API_URL}/api/auth/password-reset-confirm/${uidb64}/${token}/`;
-
-            const response = await axios.post(endpoint, email ? { email } : null);
-
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
-
-// Set New Password
-export const setNewPassword = createAsyncThunk(
-    "auth/setNewPassword",
-    async (passwordData, { rejectWithValue }) => {
-        try {
-            const response = await axios.post(`${API_URL}/api/auth/set-new-password/`, passwordData);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
-
-// Change Password
-export const changePassword = createAsyncThunk(
-    "auth/changePassword",
-    async (passwordData, { rejectWithValue }) => {
-        try {
-            const response = await axios.post(`${API_URL}/api/auth/change-password/`, passwordData);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
-
-// Refresh Token
-export const refreshToken = createAsyncThunk(
-    "auth/refreshToken",
-    async (refreshToken, { rejectWithValue }) => {
-        try {
-            const response = await axios.post(`${API_URL}/api/auth/token/refresh/`, { refresh: refreshToken });
-
-            const { access } = response.data;
-
-            // Update access token in local storage
-            const authToken = JSON.parse(localStorage.getItem("authToken")) || {};
-            authToken.access_token = access;
-            localStorage.setItem("authToken", JSON.stringify(authToken));
-
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
+export const {
+    useCurrentUserQuery,
+    useRegisterMutation,
+    useVerifyEmailMutation,
+    useLoginMutation,
+    useLogoutMutation,
+    useRequestPasswordResetMutation,
+    useConfirmPasswordResetQuery,
+    useSetNewPasswordMutation,
+    useChangePasswordMutation,
+    useRefreshTokenMutation,
+} = authApi;

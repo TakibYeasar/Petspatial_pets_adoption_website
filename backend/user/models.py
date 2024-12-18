@@ -33,7 +33,6 @@ class Adopter(models.Model):
     social_media_links = models.JSONField(
         _("Social Media Links (JSON)"), blank=True, null=True
     )
-    is_verified = models.BooleanField(_("Verified"), default=False)
     is_deleted = models.BooleanField(_("Deleted"), default=False)
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated At"), auto_now=True)
@@ -69,7 +68,6 @@ class Publisher(models.Model):
     social_media_links = models.JSONField(
         _("Social Media Links (JSON)"), blank=True, null=True
     )
-    is_verified = models.BooleanField(_("Verified"), default=False)
     is_deleted = models.BooleanField(_("Deleted"), default=False)
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated At"), auto_now=True)

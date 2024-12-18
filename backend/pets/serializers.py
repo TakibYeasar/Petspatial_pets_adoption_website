@@ -8,6 +8,17 @@ class PetSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['is_adopted', 'is_booked',
                             'publisher', 'created_at', 'updated_at']
+        # depth = 1
+
+    def get_image(self, obj):
+        """
+        Returns the full URL for the image field if an image is uploaded.
+        """
+        request = self.context.get('request')
+        if obj.image and hasattr(obj.image, 'url'):
+            return request.build_absolute_uri(obj.image.url) if request else obj.image.url
+        return None
+
         
 
 class PetCreateSerializer(serializers.ModelSerializer):

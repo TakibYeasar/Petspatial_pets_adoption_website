@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreatePet, MyPublishedPets, MyPublishingRequests } from "../../components";
+import { CreatePet, PublishingHistory } from "../../components";
 
 const PublisherDashboard = () => {
     const [activeSection, setActiveSection] = useState('publish');
@@ -23,18 +23,10 @@ const PublisherDashboard = () => {
                     </li>
                     <li>
                         <button
-                            className={`w-full text-left p-2 rounded hover:bg-blue-700 ${activeSection === 'requests' ? 'bg-blue-600' : ''}`}
-                            onClick={() => handleSectionChange('requests')}
+                            className={`w-full text-left p-2 rounded hover:bg-blue-700 ${activeSection === 'history' ? 'bg-blue-600' : ''}`}
+                            onClick={() => handleSectionChange('history')}
                         >
-                            My Publishing Requests
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            className={`w-full text-left p-2 rounded hover:bg-blue-700 ${activeSection === 'status' ? 'bg-blue-600' : ''}`}
-                            onClick={() => handleSectionChange('status')}
-                        >
-                            My Published Pets
+                            Publishing History
                         </button>
                     </li>
                 </ul>
@@ -47,15 +39,9 @@ const PublisherDashboard = () => {
                     </div>
                 )}
 
-                {activeSection === 'requests' && (
+                {activeSection === 'history' && (
                     <div>
-                        <MyPublishingRequests />
-                    </div>
-                )}
-
-                {activeSection === 'status' && (
-                    <div>
-                        <MyPublishedPets />
+                        <PublishingHistory />
                     </div>
                 )}
             </div>

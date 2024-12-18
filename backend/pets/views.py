@@ -4,123 +4,108 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 from .models import Pet
 from .serializers import PetSerializer, PetCreateSerializer
 
+
+class ManagePetsView(APIView):
+    """
+    View to approve, edit approval status, delete a pet, or get all pets by authenticated admin.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        if request.user.role != 'admin':
+            return Response(
+                {"detail": "You do not have permission to view pets."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        pets = Pet.objects.all()
+        serializer = PetSerializer(pets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, pk, *args, **kwargs):
+        if request.user.role != 'admin':
+            return Response(
+                {"detail": "You do not have permission to approve or edit pets."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
+        try:
+            pet = Pet.objects.get(pk=pk)
+        except Pet.DoesNotExist:
+            return Response({"detail": "Pet not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        is_approved = request.data.get("is_approved", None)
+
+        if is_approved is not None:
+            pet.is_approved = is_approved
+            pet.adopt_status = (
+                pet.PetAdoptStatus.AVAILABLE if is_approved else pet.PetAdoptStatus.PENDING
+            )
+            pet.save()
+
+            status_message = (
+                "approved" if is_approved else "set to pending approval"
+            )
+            return Response(
+                {"detail": f"Pet '{pet.name}' has been {status_message}."},
+                status=status.HTTP_200_OK,
+            )
+            
+        if pet.is_approved:
+            return Response(
+                {"detail": f"Pet '{pet.name}' is already approved."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        pet.is_approved = True
+        pet.adopt_status = "AVAILABLE"
+        pet.save()
+
+        return Response(
+            {"detail": f"Pet '{pet.name}' approved successfully."},
+            status=status.HTTP_200_OK,
+        )
+
+    def delete(self, request, pk, *args, **kwargs):
+        if request.user.role != 'admin':
+            return Response(
+                {"detail": "You do not have permission to delete pets."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        try:
+            pet = Pet.objects.get(pk=pk)
+        except Pet.DoesNotExist:
+            return Response({"detail": "Pet not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        pet.delete()
+        return Response(
+            {"detail": f"Pet '{pet.name}' has been successfully removed."},
+            status=status.HTTP_200_OK,
+        )
+        
 
 class PetCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         user = request.user
-
-        # Check if the user has the role of 'publisher' or 'admin'
-        if user.role not in ['publisher', 'admin']:
+        if user.role != 'publisher':
             raise PermissionDenied(
                 "You do not have permission to create a pet.")
 
-        # Deserialize and validate data
         serializer = PetCreateSerializer(data=request.data)
         if serializer.is_valid():
-            # Save the pet instance with the publisher set to the current user
-            pet = serializer.save(publisher=user)
+            serializer.save(publisher=user)
             return Response(
                 {"message": "Pet created successfully", "pet": serializer.data},
                 status=status.HTTP_201_CREATED
             )
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ApprovePetView(APIView):
-    permission_classes = [IsAdminUser]
-
-    def patch(self, request, pk, *args, **kwargs):
-        try:
-            pet = Pet.objects.get(pk=pk)
-            
-            if pet.is_approved:
-                return Response(
-                    {"detail": f"Pet '{pet.name}' is already approved."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            
-        except Pet.DoesNotExist:
-            return Response({"detail": "Pet not found."}, status=HTTP_404_NOT_FOUND)
-
-        pet.is_approved = True
-        pet.adopt_status = "AVAILABLE"  # Assuming 'AVAILABLE' means approved
-        pet.save()
-        return Response(
-            {"detail": f"Pet '{pet.name}' approved successfully."},
-            status=status.HTTP_200_OK,
-        )
-
-
-class EditApprovalView(APIView):
-    """
-    View to edit the approval status of a pet by admin.
-    """
-    permission_classes = [IsAdminUser]
-
-    def patch(self, request, pk, *args, **kwargs):
-        # Retrieve the pet by its primary key (pk)
-        pet = Pet.objects.get(pk=pk)
-
-        # Extract approval status from the request
-        is_approved = request.data.get("is_approved", None)
-        if is_approved is None:
-            return Response(
-                {"detail": "The 'is_approved' field is required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Update approval status
-        pet.is_approved = is_approved
-        pet.adopt_status = (
-            pet.PetAdoptStatus.AVAILABLE if is_approved else pet.PetAdoptStatus.PENDING
-        )
-        pet.save()
-
-        status_message = (
-            "approved" if is_approved else "set to pending approval"
-        )
-        return Response(
-            {"detail": f"Pet '{pet.name}' has been {status_message}."},
-            status=status.HTTP_200_OK,
-        )
-
-
-class RemovePetView(APIView):
-    """
-    View to remove a pet by admin.
-    """
-    permission_classes = [IsAdminUser]
-
-    def delete(self, request, pk, *args, **kwargs):
-        # Retrieve the pet by its primary key (pk)
-        pet = Pet.objects.get(pk=pk)
-
-        # Delete the pet
-        pet.delete()
-
-        return Response(
-            {"detail": f"Pet '{pet.name}' has been successfully removed."},
-            status=status.HTTP_200_OK,
-        )
-        
-        
-class SinglePetView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, pk, *args, **kwargs):
-        try:
-            pet = Pet.objects.get(pk=pk)
-        except Pet.DoesNotExist:
-            return Response({"detail": "Pet not found."}, status=HTTP_404_NOT_FOUND)
-
-        serializer = PetSerializer(pet)
-        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class PetUpdateView(APIView):
@@ -128,22 +113,22 @@ class PetUpdateView(APIView):
 
     def put(self, request, pk, *args, **kwargs):
         try:
-            pet = Pet.objects.get(pk=pk, publisher=request.user)
-            
-            if pet.publisher != request.user and not request.user.is_staff:
+            pet = Pet.objects.get(pk=pk)
+            if pet.publisher != request.user:
                 return Response(
                     {"detail": "You do not have permission to update this pet."},
                     status=status.HTTP_403_FORBIDDEN,
                 )
-                
+
         except Pet.DoesNotExist:
-            return Response({"detail": "Pet not found or not owned by you."}, status=HTTP_404_NOT_FOUND)
+            return Response({"detail": "Pet not found or not owned by you."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = PetCreateSerializer(pet, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=HTTP_200_OK)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PetDeleteView(APIView):
@@ -151,16 +136,15 @@ class PetDeleteView(APIView):
 
     def delete(self, request, pk, *args, **kwargs):
         try:
-            pet = Pet.objects.get(pk=pk, publisher=request.user)
-            
-            if pet.publisher != request.user and not request.user.is_staff:
+            pet = Pet.objects.get(pk=pk)
+            if pet.publisher != request.user:
                 return Response(
                     {"detail": "You do not have permission to delete this pet."},
                     status=status.HTTP_403_FORBIDDEN,
                 )
-                
+
         except Pet.DoesNotExist:
-            return Response({"detail": "Pet not found or not owned by you."}, status=HTTP_404_NOT_FOUND)
+            return Response({"detail": "Pet not found or not owned by you."}, status=status.HTTP_404_NOT_FOUND)
 
         pet.delete()
         return Response(
@@ -169,110 +153,90 @@ class PetDeleteView(APIView):
         )
 
 
+class AllPetsView(APIView):
+    def get(self, request, *args, **kwargs):
+        pets = Pet.objects.all()
+        serializer = PetSerializer(pets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SinglePetView(APIView):
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            pet = Pet.objects.get(pk=pk)
+        except Pet.DoesNotExist:
+            return Response({"detail": "Pet not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = PetSerializer(pet)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AdopterAdoptedPetsView(APIView):
+    """
+    View to list all pets adopted by the authenticated adopter.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user.role != "adopter":
+            return Response(
+                {"detail": "You are not authorized to view this information."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        adopted_pets = Pet.objects.filter(is_adopted=True, adopter__user=user)
+        serializer = PetSerializer(adopted_pets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class AdoptPetView(APIView):
+    """
+    View for handling pet adoption.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk, *args, **kwargs):
+        if request.user.role != 'adopter':
+            raise PermissionDenied(
+                {"detail": "You do not have permission to adopt pets."})
+
         try:
-            # Retrieve the pet by ID and check if its adoption status is AVAILABLE
             pet = Pet.objects.get(pk=pk, adopt_status="AVAILABLE")
         except Pet.DoesNotExist:
             raise NotFound(
                 {"detail": "Pet not available for adoption or does not exist."})
 
         if not pet.is_approved:
-            return Response(
-                {"detail": "This pet has not been approved for adoption."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise PermissionDenied(
+                {"detail": "This pet has not been approved for adoption."})
 
-        # Update the pet's adoption details
         pet.adopt_status = "ADOPTED"
         pet.is_adopted = True
-        pet.is_booked = False  # Ensure the pet is no longer booked
+        pet.is_booked = False
         pet.save()
-
         return Response(
             {"detail": f"Pet '{pet.name}' adopted successfully."},
             status=status.HTTP_200_OK
         )
 
 
-class ManagePetsView(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def get(self, request, *args, **kwargs):
-        """Fetch all pets."""
-        pets = Pet.objects.all()
-        serializer = PetSerializer(pets, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request, *args, **kwargs):
-        pet_id = request.data.get("id")
-        if not pet_id:
-            return Response(
-                {"error": "Pet ID is required for updating."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        pet = Pet.objects.filter(id=pet_id)
-
-        # Update fields if provided
-        update_fields = {}
-        for field in ["adopt_status", "is_approved"]:
-            if field in request.data:
-                update_fields[field] = request.data[field]
-
-        for key, value in update_fields.items():
-            setattr(pet, key, value)
-
-        pet.save()
-        serializer = PetSerializer(pet)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def delete(self, request, *args, **kwargs):
-        pet_id = request.data.get("id")
-        if not pet_id:
-            return Response(
-                {"error": "Pet ID is required for deletion."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        pet = Pet.objects.filter(id=pet_id)
-        pet.delete()
-        return Response({"message": "Pet deleted successfully."}, status=status.HTTP_200_OK)
-
-class AllPetsView(APIView):
-
-    def get(self, request, *args, **kwargs):
-        pets = Pet.objects.all()
-        serializer = PetSerializer(pets, many=True)
-        return Response(serializer.data, status=HTTP_200_OK)
-
-
-class MyPublishedPets(APIView):
+class PublisherPetListView(APIView):
+    """
+    View to list all pets published by the authenticated publisher.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        pets = Pet.objects.filter(publisher=request.user)
-        serializer = PetSerializer(pets, many=True)
+        user = request.user
+        if user.role != "publisher":
+            return Response(
+                {"detail": "You are not authorized to view this information."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        publiser_pets = Pet.objects.filter(publisher=user)
+        serializer = PetSerializer(publiser_pets, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    def put(self, request):
-        pet_id = request.data.get("id")
-        pet = Pet.objects.filter(id=pet_id, publisher=request.user)
-        serializer = PetCreateSerializer(pet, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=HTTP_200_OK)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-
-class MyPublishingRequestPets(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        pets = Pet.objects.filter(is_approved=False, is_adopted=False).exclude(publisher=request.user)
-        serializer = PetSerializer(pets, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 

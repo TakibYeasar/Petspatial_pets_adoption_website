@@ -11,8 +11,6 @@ urlpatterns = [
          name='current-user'),
     path('register/', RegisterView.as_view(), name='register'),
     path('verify-email/', VerifyUserEmail.as_view(), name='verify_email'),
-    path('approve-publisher/<int:user_id>/',
-         ApprovePublisherView.as_view(), name='approve-publisher'),
     path('login/', LoginUserView.as_view(), name='login_user'),
     path('logout/', LogoutUserView.as_view(), name='logout'),
     path('password-reset/',

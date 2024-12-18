@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { createPet } from "../../../redux/features/pets/petsApi";
+import { useCreatePetMutation } from "../../../redux/features/pets/petsApi";
 import { useNavigate } from "react-router-dom";
 
 const GENDER_OPTIONS = [
@@ -37,8 +36,6 @@ const ADOPTION_STATUS_OPTIONS = [
 
 const CreatePet = () => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const { loading, error } = useSelector((state) => state.pets);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -63,16 +60,15 @@ const CreatePet = () => {
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
+    const { loading, error, dispatch } = useCreatePetMutation();
+
     const handleChange = (e) => {
         const { name, value, type, files } = e.target;
         if (type === "file") {
-            const file = files[0];
-            setImage(file);
-            const reader = new FileReader();
-            reader.onloadend = () => setImagePreview(reader.result);
-            if (file) reader.readAsDataURL(file);
+            setImage(files[0]);
+            setImagePreview(URL.createObjectURL(files[0]));
         } else {
-            setFormData({ ...formData, [name]: value });
+            setFormData((prev) => ({ ...prev, [name]: value }));
         }
     };
 
@@ -88,8 +84,8 @@ const CreatePet = () => {
         }
 
         try {
-            await dispatch(createPet(form)).unwrap();
-            navigate("/admin");
+            await dispatch(useCreatePetMutation(form)).unwrap();
+            navigate("/publisher");
         } catch (err) {
             console.error("Failed to create pet:", err);
         }
@@ -116,16 +112,9 @@ const CreatePet = () => {
                 </div>
             )}
 
-            <form
-                onSubmit={handleSubmit}
-                className="space-y-4"
-                encType="multipart/form-data"
-            >
+            <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
                 <div>
-                    <label
-                        htmlFor="name"
-                        className="block text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                         Pet Name
                     </label>
                     <input
@@ -140,23 +129,17 @@ const CreatePet = () => {
                     />
                 </div>
 
-                {/* Additional Inputs */}
-                {[
-                    { name: "birth_date", type: "date", label: "Birth Date" },
-                    { name: "age", placeholder: "Age (years)", type: "number", required: true },
-                    { name: "breed", placeholder: "Breed", type: "text", required: true },
-                    { name: "weight", placeholder: "Weight (kg)", type: "number", required: true },
-                    { name: "height", placeholder: "Height (cm)", type: "number", required: true },
-                    { name: "color", placeholder: "Color", type: "text" },
-                    { name: "microchip_id", placeholder: "Microchip ID", type: "text" },
-                    { name: "location", placeholder: "Location", type: "text" },
-                    { name: "adoption_fee", placeholder: "Adoption Fee", type: "number" },
-                ].map((field) => (
+                {[{ name: "birth_date", type: "date", label: "Birth Date" },
+                { name: "age", placeholder: "Age (years)", type: "number", required: true },
+                { name: "breed", placeholder: "Breed", type: "text", required: true },
+                { name: "weight", placeholder: "Weight (kg)", type: "number", required: true },
+                { name: "height", placeholder: "Height (cm)", type: "number", required: true },
+                { name: "color", placeholder: "Color", type: "text" },
+                { name: "microchip_id", placeholder: "Microchip ID", type: "text" },
+                { name: "location", placeholder: "Location", type: "text" },
+                { name: "adoption_fee", placeholder: "Adoption Fee", type: "number" }].map((field) => (
                     <div key={field.name}>
-                        <label
-                            htmlFor={field.name}
-                            className="block text-sm font-medium text-gray-700"
-                        >
+                        <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
                             {field.label || field.placeholder}
                         </label>
                         <input
@@ -172,12 +155,8 @@ const CreatePet = () => {
                     </div>
                 ))}
 
-                {/* Image Upload */}
                 <div>
-                    <label
-                        htmlFor="image"
-                        className="block text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="image" className="block text-sm font-medium text-gray-700">
                         Upload Pet Image
                     </label>
                     <input
@@ -199,19 +178,13 @@ const CreatePet = () => {
                     )}
                 </div>
 
-                {/* Dropdowns */}
-                {[
-                    { name: "gender", options: GENDER_OPTIONS },
-                    { name: "size", options: SIZE_OPTIONS },
-                    { name: "health_status", options: HEALTH_STATUS_OPTIONS },
-                    { name: "vaccination_status", options: VACCINATION_STATUS_OPTIONS },
-                    { name: "adopt_status", options: ADOPTION_STATUS_OPTIONS },
-                ].map((field) => (
+                {[{ name: "gender", options: GENDER_OPTIONS },
+                { name: "size", options: SIZE_OPTIONS },
+                { name: "health_status", options: HEALTH_STATUS_OPTIONS },
+                { name: "vaccination_status", options: VACCINATION_STATUS_OPTIONS },
+                { name: "adopt_status", options: ADOPTION_STATUS_OPTIONS }].map((field) => (
                     <div key={field.name}>
-                        <label
-                            htmlFor={field.name}
-                            className="block text-sm font-medium text-gray-700"
-                        >
+                        <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
                             {field.name.replace("_", " ").toUpperCase()}
                         </label>
                         <select
@@ -233,16 +206,10 @@ const CreatePet = () => {
                     </div>
                 ))}
 
-                {/* Textareas */}
-                {[
-                    { name: "description", placeholder: "Description" },
-                    { name: "special_needs", placeholder: "Special Needs" },
-                ].map((field) => (
+                {[{ name: "description", placeholder: "Description" },
+                { name: "special_needs", placeholder: "Special Needs" }].map((field) => (
                     <div key={field.name}>
-                        <label
-                            htmlFor={field.name}
-                            className="block text-sm font-medium text-gray-700"
-                        >
+                        <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
                             {field.placeholder}
                         </label>
                         <textarea

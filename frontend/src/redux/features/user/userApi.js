@@ -1,161 +1,63 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import getAuthToken from "../api/api";
+import { apiSlice } from "../../api/api";
+import { USERS_URL } from "../../constant";
 
-const API_URL = "http://127.0.0.1:8000"; // Base URL for Django API
+export const userApi = apiSlice.injectEndpoints({
+    endpoints: (builder) => ({
+        // Fetch all users for management
+        manageUsers: builder.query({
+            query: () => ({
+                url: `${USERS_URL}/manage-users/`,
+            }),
+        }),
 
-const handleApiError = (error) =>
-    error.response?.data || { message: "An error occurred. Please try again." };
+        // Change user role by its ID
+        changeUserRole: builder.mutation({
+            query: (id) => ({
+                url: `${PETS_URL}/user/${id}/change-role/`,
+                method: "PATCH",
+            }),
+        }),
 
-// Fetch all users
-export const ManageUsersAPI = createAsyncThunk(
-    "users/ManageUsers",
-    async (_, { rejectWithValue }) => {
-        try {
-            const token = getAuthToken();
-            const response = await axios.get(`${API_URL}/api/user/manage-users/`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
+        // Remove a user by its ID
+        removeUser: builder.mutation({
+            query: (id) => ({
+                url: `${PETS_URL}/user/${id}/remove/`,
+                method: "DELETE",
+            }),
+        }),
 
-// Update user role
-export const updateUserRole = createAsyncThunk(
-    "users/updateUserRole",
-    async ({ id, role }, { rejectWithValue }) => {
-        try {
-            const token = getAuthToken();
-            const response = await axios.put(
-                `${API_URL}/api/user/manage-users/`,
-                { id, role },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            return { id, role }; // Return updated user info
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
+        // Create a new user profile
+        createUserProfile: builder.mutation({
+            query: (profileData) => ({
+                url: `${USERS_URL}/create-profile/`,
+                method: "POST",
+                body: profileData,
+            }),
+        }),
 
-// Approve a publisher
-export const approvePublisher = createAsyncThunk(
-    "users/approvePublisher",
-    async ({ id }, { rejectWithValue }) => {
-        try {
-            const token = getAuthToken();
-            const response = await axios.put(
-                `${API_URL}/api/user/manage-users/`,
-                { id, approve_publisher: true },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            return { id }; // Return approved publisher's ID
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
+        // Fetch the profile of the current user
+        fetchUserProfile: builder.query({
+            query: () => ({
+                url: `${USERS_URL}/profile/`,
+            }),
+        }),
 
-// Delete a user
-export const deleteUser = createAsyncThunk(
-    "users/deleteUser",
-    async ({ id }, { rejectWithValue }) => {
-        try {
-            const token = getAuthToken();
-            const response = await axios.delete(`${API_URL}/api/user/manage-users/`, {
-                data: { id },
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            return { id }; // Return deleted user's ID
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-)
+        // Update the user's profile
+        updateUserProfile: builder.mutation({
+            query: (profileData) => ({
+                url: `${USERS_URL}/update-profile/`,
+                method: "PUT",
+                body: profileData,
+            }),
+        }),
+    }),
+});
 
-// Fetch user profile
-export const fetchUserProfile = createAsyncThunk(
-    "users/fetchUserProfile",
-    async (_, { rejectWithValue }) => {
-        try {
-            const token = getAuthToken();
-            const response = await axios.get(`${API_URL}/profile/`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
-
-// Update user profile
-export const updateUserProfile = createAsyncThunk(
-    "users/updateUserProfile",
-    async (profileData, { rejectWithValue }) => {
-        try {
-            const token = getAuthToken();
-            const response = await axios.put(`${API_URL}/update-profile/`, profileData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
-
-// Fetch adopted pets
-export const fetchAdoptedPets = createAsyncThunk(
-    "pets/fetchAdoptedPets",
-    async (_, { rejectWithValue }) => {
-        try {
-            const token = getAuthToken();
-            const response = await axios.get(`${API_URL}/adopted-pets/`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
-
-// Fetch published pets
-export const fetchPublishedPets = createAsyncThunk(
-    "pets/fetchPublishedPets",
-    async (_, { rejectWithValue }) => {
-        try {
-            const token = getAuthToken();
-            const response = await axios.get(`${API_URL}/published-pets/`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(handleApiError(error));
-        }
-    }
-);
+export const {
+    useManageUsersQuery,
+    useChangeUserRoleMutation,
+    useRemoveUserMutation,
+    useCreateUserProfileMutation,
+    useFetchUserProfileQuery,
+    useUpdateUserProfileMutation,
+} = userApi;

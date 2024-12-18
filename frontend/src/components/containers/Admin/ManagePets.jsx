@@ -1,37 +1,38 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
 import {
-  managePetsAPI,
-  updatePets,
-  deletePet,
+  useManagePetsQuery,
+  useApprovePetMutation,
+  useEditApprovalMutation,
+  useRemovePetMutation,
 } from "../../../redux/features/pets/petsApi";
 
 const ManagePets = () => {
-  const dispatch = useDispatch();
-  const { pets, loading, error } = useSelector((state) => state.pets);
+  const { data: pets, error, isLoading } = useManagePetsQuery();
+  const [approvePet] = useApprovePetMutation();
+  const [editApproval] = useEditApprovalMutation();
+  const [removePet] = useRemovePetMutation();
 
-  useEffect(() => {
-    dispatch(managePetsAPI());
-  }, [dispatch]);
-
-  const handleApproveStatusChange = (petId, newStatus) => {
-    dispatch(updatePets({ id: petId, approveStatus: newStatus }));
+  const handleApproveStatusChange = (id, status) => {
+    // Call mutation to update approval status
+    editApproval({ petId: id, isApproved: status });
   };
 
-  const handleAdoptStatusChange = (petId, newStatus) => {
-    dispatch(updatePets({ id: petId, adoptStatus: newStatus }));
+  const handleAdoptStatusChange = (id, status) => {
+    // Call mutation to update adopt status
+    approvePet({ petId: id, isAdopted: status });
   };
 
-  const handleDeletePet = (petId) => {
-    dispatch(deletePet({ id: petId }));
+  const handleDeletePet = (id) => {
+    // Call mutation to remove the pet
+    removePet(id);
   };
 
-  if (loading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div>Error: {error.message}</div>;
   }
 
   return (

@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchPublishedPets } from "../../../redux/features/pets/petsApi";
-import UpdatePet from "./UpdatePet";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { usePublisherPetsQuery } from "../../../redux/features/pets/petsApi";
+import UpdatePet from "./UpdatePet";
 
-const MyPublishedPets = () => {
-  const dispatch = useDispatch();
+const PublishingHistory = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const { pets, loading, error } = useSelector((state) => state.pets || {});
   const [selectedPet, setSelectedPet] = useState(null);
 
+  const { data: pets, error, isLoading: loading } = usePublisherPetsQuery();
+
   useEffect(() => {
-    dispatch(fetchPublishedPets());
+    dispatch(usePublisherPetsQuery());
   }, [dispatch]);
 
   const handleEditClick = (pet) => {
@@ -37,11 +38,7 @@ const MyPublishedPets = () => {
       {selectedPet ? (
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-2">Edit Pet</h2>
-          <UpdatePet
-            pet={selectedPet}
-            onCancel={handleCancelEdit}
-            onSuccess={handleCancelEdit}
-          />
+          <UpdatePet pet={selectedPet} onCancel={handleCancelEdit} onSuccess={handleCancelEdit} />
         </div>
       ) : (
         <div>
@@ -83,4 +80,4 @@ const MyPublishedPets = () => {
   );
 };
 
-export default MyPublishedPets;
+export default PublishingHistory;

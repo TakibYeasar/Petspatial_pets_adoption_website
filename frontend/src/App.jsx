@@ -1,33 +1,51 @@
 import React, { useEffect } from 'react';
 import './App.css';
-import { Navbar, Footer, SignUp, SignIn, ForgotPassword, ResetPassword, ChangePassword, EmailVerification } from "./components";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Home, AllPets, About, Service, Contact, AdminDashboard, AdopterDashboard, PublisherDashboard } from './pages';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchCurrentUser } from './redux/features/auth/authApi';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  Navbar,
+  Footer,
+  SignUp,
+  SignIn,
+  ForgotPassword,
+  ResetPassword,
+  ChangePassword,
+  EmailVerification,
+} from './components';
+import {
+  Home,
+  AllPets,
+  About,
+  Service,
+  Contact,
+  AdminDashboard,
+  AdopterDashboard,
+  PublisherDashboard,
+} from './pages';
+import { useDispatch } from 'react-redux';
+import { useCurrentUserQuery } from './redux/features/auth/authApi';
 
 function App() {
   const dispatch = useDispatch();
-  const { user, loading, isAuthenticated } = useSelector((state) => state.auth);
+  const { data: user, isLoading, error } = useCurrentUserQuery();
 
-  useEffect(() => {
-    const authToken = JSON.parse(localStorage.getItem('authToken'));
-    if (authToken && authToken.access_token) {
-      dispatch(fetchCurrentUser());
-    }
-  }, [dispatch]);
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
+  const isAuthenticated = !!user; // Boolean indicating authentication status
 
   // Protected Route Component
   const ProtectedRoute = ({ children }) => {
-    return isAuthenticated ? children : <Navigate to="/sign-in" />;
+    if (isLoading) {
+      return <div>Loading...</div>; // Show a loading indicator while fetching user data
+    }
+
+    if (error) {
+      return <Navigate to="/sign-in" replace />; // Redirect to sign-in on error
+    }
+
+    return isAuthenticated ? children : <Navigate to="/sign-in" replace />;
   };
 
   return (
     <BrowserRouter>
+      {/* Navbar receives user and authentication status */}
       <Navbar user={user} isAuthenticated={isAuthenticated} />
       <Routes>
         {/* Public Routes */}

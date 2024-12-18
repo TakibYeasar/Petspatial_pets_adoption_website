@@ -1,38 +1,31 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
 import {
-  ManageUsersAPI,
-  updateUserRole,
-  deleteUser,
-  approvePublisher,
+  useManageUsersQuery,
+  useChangeUserRoleMutation,
+  useRemoveUserMutation,
 } from "../../../redux/features/user/userApi";
 
 const ManageUsers = () => {
-  const dispatch = useDispatch();
-  const { users, loading, error } = useSelector((state) => state.users);
+  const { data: users, error, isLoading } = useManageUsersQuery();
+  const [changeUserRole] = useChangeUserRoleMutation();
+  const [removeUser] = useRemoveUserMutation();
 
-  useEffect(() => {
-    dispatch(ManageUsersAPI());
-  }, [dispatch]);
-
-  const handleRoleChange = (userId, newRole) => {
-    dispatch(updateUserRole({ id: userId, role: newRole }));
+  const handleRoleChange = (id, newRole) => {
+    // Call mutation to change user role
+    changeUserRole({ userId: id, role: newRole });
   };
 
-  const handleApprovePublisher = (userId) => {
-    dispatch(approvePublisher({ id: userId }));
+  const handleDeleteUser = (id) => {
+    // Call mutation to delete the user
+    removeUser(id);
   };
 
-  const handleDeleteUser = (userId) => {
-    dispatch(deleteUser({ id: userId }));
-  };
-
-  if (loading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div>Error: {error.message}</div>;
   }
 
   return (
@@ -69,15 +62,6 @@ const ManageUsers = () => {
                     <option value="publisher">Publisher</option>
                     <option value="user">Adopter</option>
                   </select>
-                  {/* Approve Publisher */}
-                  {user.role === "publisher" && !user.is_approved && (
-                    <button
-                      className="bg-green-500 text-white px-3 py-1 rounded"
-                      onClick={() => handleApprovePublisher(user.id)}
-                    >
-                      Approve
-                    </button>
-                  )}
                   {/* Delete User */}
                   <button
                     className="bg-red-500 text-white px-3 py-1 rounded"

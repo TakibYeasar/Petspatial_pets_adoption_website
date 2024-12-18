@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
-import { verifyEmail } from "../../../redux/features/auth/authApi";
+import { useVerifyEmailMutation } from "../../../redux/features/auth/authApi";
 
 const EmailVerification = () => {
     const [otp, setOtp] = useState('');
@@ -15,7 +15,7 @@ const EmailVerification = () => {
     const handleVerify = async (e) => {
         e.preventDefault();
         try {
-            const response = await dispatch(verifyEmail(otp)).unwrap();
+            const response = await dispatch(useVerifyEmailMutation(otp)).unwrap();
             setMessage(response.message);
             // Redirect to /signin after successful verification
             setTimeout(() => navigate('/signin'));

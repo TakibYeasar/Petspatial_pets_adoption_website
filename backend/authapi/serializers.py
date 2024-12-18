@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             "id", "email", "username", "first_name", "last_name",
-            "role", "is_active", "is_verified", "is_approved"
+            "role", "is_active", "is_verified"
         ]
 
 
@@ -53,8 +53,6 @@ class LoginSerializer(serializers.Serializer):
                 "Invalid credentials, please try again.")
         if not user.is_verified:
             raise AuthenticationFailed("Email is not verified.")
-        if not user.is_approved:
-            raise AuthenticationFailed("Account not approved.")
 
         tokens = user.tokens()
         return {

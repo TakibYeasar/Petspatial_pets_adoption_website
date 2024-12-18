@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaFacebook, FaGoogle, FaTwitter } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "../../../redux/features/auth/authApi";
+import { useRegisterMutation } from "../../../redux/features/auth/authApi";
 
 const SignUp = () => {
     const navigate = useNavigate(); // For navigation in React Router
@@ -45,8 +45,8 @@ const SignUp = () => {
             role: selectedRole || 'adopter', // Default to 'adopter' if no role is selected
         };
 
-        // Dispatch the registerUser action with the complete formData including role
-        const result = await dispatch(registerUser(signUpData));
+        // Dispatch the useRegisterMutation action with the complete formData including role
+        const result = await dispatch(useRegisterMutation(signUpData));
 
         // Handle success or failure
         if (result?.payload?.message) {
